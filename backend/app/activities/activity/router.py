@@ -47,6 +47,10 @@ router = APIRouter()
 # both JWT and API key authentication
 api_upload_router = APIRouter()
 
+# Separate router for read-only endpoints that support
+# both JWT and API key authentication
+api_read_router = APIRouter()
+
 # Define the thread pool executor with 2 workers
 executor = ThreadPoolExecutor(max_workers=2)
 
@@ -99,17 +103,17 @@ async def read_activities_user_activities_week(
     return activities
 
 
-@router.get(
+@api_read_router.get(
     "/user/{user_id}/thisweek/stats",
     response_model=activities_schema.ActivityStats,
 )
 async def read_activities_user_activities_this_week_stats(
     user_id: int,
     _validate_user_id: Annotated[Callable, Depends(users_dependencies.validate_user_id)],
-    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["activities:read"])],
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_auth_scopes, scopes=["activities:read"])],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     db: Annotated[
         Session,
@@ -142,17 +146,17 @@ async def read_activities_user_activities_this_week_stats(
     return activities_schema.ActivityStats()
 
 
-@router.get(
+@api_read_router.get(
     "/user/{user_id}/thismonth/stats",
     response_model=activities_schema.ActivityStats,
 )
 async def read_activities_user_activities_this_month_stats(
     user_id: int,
     _validate_user_id: Annotated[Callable, Depends(users_dependencies.validate_user_id)],
-    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["activities:read"])],
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_auth_scopes, scopes=["activities:read"])],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     db: Annotated[
         Session,
@@ -437,7 +441,7 @@ async def read_activities_types(
     return activities_crud.get_distinct_activity_types_for_user(token_user_id, db)
 
 
-@router.get(
+@api_read_router.get(
     "/user/{user_id}/page_number/{page_number}/num_records/{num_records}",
     response_model=list[activities_schema.Activity] | None,
 )
@@ -447,10 +451,10 @@ async def read_activities_user_activities_pagination(
     page_number: int,
     num_records: int,
     validate_pagination_values: Annotated[Callable, Depends(core_dependencies.validate_pagination_values)],
-    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["activities:read"])],
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_auth_scopes, scopes=["activities:read"])],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     db: Annotated[
         Session,

@@ -5,7 +5,18 @@ import secrets
 
 import auth.token_hashing as token_hashing
 
-SUPPORTED_API_KEY_SCOPES = frozenset({"activities:upload"})
+# Read scopes are only honoured on endpoints mounted on an
+# ``api_read_router`` (see ``core/routes.py``); every other
+# endpoint remains JWT-only regardless of the scopes a key holds.
+SUPPORTED_API_KEY_SCOPES = frozenset(
+    {
+        "activities:upload",
+        "activities:read",
+        "gears:read",
+        "health:read",
+        "profile",
+    }
+)
 
 
 def generate_api_key() -> str:
@@ -47,17 +58,19 @@ def validate_api_key_scopes(
     """
     Validate requested scopes against supported API-key scopes.
 
-    API keys currently support only activity uploads. Keeping this
-    allow-list separate from the full JWT scope set prevents API keys
-    from silently gaining access when new unified-auth endpoints are
-    added later.
+    API keys support activity uploads and a small set of read-only
+    scopes. Keeping this allow-list separate from the full JWT scope
+    set prevents API keys from silently gaining access when new
+    unified-auth endpoints are added later. Every allowed scope is
+    part of the regular-user scope set, so no key can exceed its
+    owner's privileges.
 
     Args:
         requested_scopes: List of scopes the caller wants
             to assign to the new API key.
         _user_access_type: The owner's access type. Accepted for
             router compatibility but not used while API-key scopes
-            are restricted to activity uploads.
+            are restricted to regular-user scopes.
 
     Raises:
         ValueError: If any requested scope is not supported.
