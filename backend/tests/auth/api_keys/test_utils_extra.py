@@ -3,6 +3,7 @@
 import pytest
 
 import auth.api_keys.utils as auth_api_keys_utils
+import auth.constants as auth_constants
 
 
 class TestGenerateApiKey:
@@ -74,7 +75,22 @@ class TestValidateApiKeyScopes:
 
     def test_supported_api_key_scopes_constant(self):
         """Test that the API-key scope allow-list is centralized."""
-        assert frozenset({"activities:upload"}) == auth_api_keys_utils.SUPPORTED_API_KEY_SCOPES
+        assert (
+            frozenset(
+                {
+                    "activities:upload",
+                    "activities:read",
+                    "gears:read",
+                    "health:read",
+                    "profile",
+                }
+            )
+            == auth_api_keys_utils.SUPPORTED_API_KEY_SCOPES
+        )
+
+    def test_supported_api_key_scopes_are_regular_user_scopes(self):
+        """Test that no API-key scope exceeds regular-user privileges."""
+        assert auth_api_keys_utils.SUPPORTED_API_KEY_SCOPES.issubset(auth_constants.REGULAR_ACCESS_SCOPE)
 
     def test_validate_regular_user_with_valid_regular_scope(self):
         """Test that a regular user can request activities:upload."""
@@ -104,10 +120,18 @@ class TestValidateApiKeyScopes:
         auth_api_keys_utils.validate_api_key_scopes(["activities:upload"], "regular")
 
     def test_validate_multiple_valid_regular_scopes(self):
-        """Test that extra JWT scopes are rejected."""
-        scopes = ["activities:upload", "activities:read"]
+        """Test that upload and read scopes can be combined."""
+        scopes = ["activities:upload", "activities:read", "gears:read", "health:read", "profile"]
+        auth_api_keys_utils.validate_api_key_scopes(scopes, "regular")
+
+    @pytest.mark.parametrize(
+        "scope",
+        ["activities:write", "gears:write", "health:write", "health_targets:read", "users:read", "notifications:read"],
+    )
+    def test_validate_jwt_only_scopes_raise(self, scope):
+        """Test that write and non-allow-listed scopes are rejected."""
         with pytest.raises(ValueError, match="Unsupported API key scopes"):
-            auth_api_keys_utils.validate_api_key_scopes(scopes, "regular")
+            auth_api_keys_utils.validate_api_key_scopes(["activities:read", scope], "regular")
 
     def test_validate_empty_list_raises_for_regular(self):
         """Test that an empty scope list is rejected."""

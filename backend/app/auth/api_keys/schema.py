@@ -31,7 +31,7 @@ class UsersApiKeyCreate(BaseModel):
 
     Attributes:
         name: User-friendly label for the key.
-        scopes: List containing the supported API key scope.
+        scopes: List of supported API key scopes.
         expires_at: Optional expiration datetime.
             None means the key never expires.
         current_password: Caller's existing password
@@ -73,7 +73,7 @@ class UsersApiKeyCreate(BaseModel):
     @classmethod
     def scopes_must_be_valid(cls, v: list[str]) -> list[str]:
         """
-        Validate API keys only grant activity upload access.
+        Validate API keys only grant supported scopes.
 
         Args:
             v: List of scope strings to validate.

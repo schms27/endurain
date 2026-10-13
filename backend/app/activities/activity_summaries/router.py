@@ -23,6 +23,10 @@ import users.users.utils as users_utils
 
 router = APIRouter()
 
+# Separate router for read-only endpoints that support
+# both JWT and API key authentication
+api_read_router = APIRouter()
+
 
 def _parse_target_date(
     target_date_str: str | None,
@@ -52,7 +56,7 @@ def _parse_target_date(
         ) from None
 
 
-@router.get(
+@api_read_router.get(
     "/{view_type}",
     response_model=(
         summary_schema.WeeklySummaryResponse
@@ -70,13 +74,13 @@ async def read_activity_summary(
     _check_scopes: Annotated[
         Callable,
         Security(
-            auth_dependencies.check_scopes,
+            auth_dependencies.check_auth_scopes,
             scopes=["activities:read"],
         ),
     ],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     db: Annotated[
         Session,

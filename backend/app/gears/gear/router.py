@@ -22,8 +22,12 @@ import gears.gear.schema as gears_schema
 # Define the API router
 router = APIRouter()
 
+# Separate router for read-only endpoints that support
+# both JWT and API key authentication
+api_read_router = APIRouter()
 
-@router.get(
+
+@api_read_router.get(
     "",
     response_model=gears_schema.GearsListResponse,
     status_code=status.HTTP_200_OK,
@@ -36,14 +40,14 @@ async def read_gears_user_all_pagination(
     _check_scopes: Annotated[
         Callable,
         Security(
-            auth_dependencies.check_scopes,
+            auth_dependencies.check_auth_scopes,
             scopes=["gears:read"],
         ),
     ],
     token_user_id: Annotated[
         int,
         Depends(
-            auth_dependencies.get_sub_from_access_token,
+            auth_dependencies.get_user_id_from_auth,
         ),
     ],
     db: Annotated[

@@ -16,6 +16,7 @@ def _build_app(mock_db):
     app = FastAPI()
     app.include_router(activity_router.router, prefix="/activities")
     app.include_router(activity_router.api_upload_router, prefix="/activities")
+    app.include_router(activity_router.api_read_router, prefix="/activities")
 
     def _mock():
         return None

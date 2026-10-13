@@ -10,6 +10,7 @@ This module provides FastAPI endpoints for:
 - Profile data export and import
 """
 
+from collections.abc import Callable
 from typing import Annotated, NoReturn
 
 from fastapi import (
@@ -18,6 +19,7 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
+    Security,
     UploadFile,
     status,
 )
@@ -51,6 +53,10 @@ import websocket.manager as websocket_manager
 # Define the API router
 router = APIRouter()
 
+# Separate router for read-only endpoints that support
+# both JWT and API key authentication
+api_read_router = APIRouter()
+
 
 def _raise_mfa_secret_store_unavailable(
     err: auth_mfa_setup_store.MFASecretStoreUnavailableError,
@@ -75,11 +81,18 @@ def _raise_mfa_secret_store_unavailable(
     ) from err
 
 
-@router.get("", status_code=status.HTTP_200_OK, response_model=users_schema.UsersMe)
+@api_read_router.get("", status_code=status.HTTP_200_OK, response_model=users_schema.UsersMe)
 async def read_users_me(
+    _check_scopes: Annotated[
+        Callable,
+        Security(
+            auth_dependencies.check_auth_scopes,
+            scopes=["profile"],
+        ),
+    ],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     identity_service: Annotated[
         auth_identity_service.IdentityService,
@@ -94,7 +107,7 @@ async def read_users_me(
     Retrieve authenticated user profile with integrations.
 
     Args:
-        token_user_id: User ID from access token.
+        token_user_id: User ID from access token or API key.
         db: Database session.
 
     Returns:
