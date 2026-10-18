@@ -89,3 +89,11 @@ See [`TRADEMARK.md`](./TRADEMARK.md) for full details.
 <div align="center">
   <sub>Built with ❤️ from Portugal | Part of the <a href="https://github.com/endurain-project">Endurain</a> ecosystem</sub>
 </div>
+
+---
+
+## Fork Disclaimer
+
+This repository ([schms27/endurain](https://github.com/schms27/endurain)) is **a fork of Endurain** ([endurain-project/endurain](https://github.com/endurain-project/endurain)). It is **not the official Endurain project**, and it is not sponsored, endorsed by, or affiliated with the Endurain project or João Vitória Silva. Changes made in this fork are its own and are not necessarily part of upstream Endurain.
+
+Endurain® is a registered trademark of João Vitória Silva. The code remains licensed under AGPL-3.0; see [`LICENSE`](LICENSE) and [`TRADEMARK.md`](TRADEMARK.md).

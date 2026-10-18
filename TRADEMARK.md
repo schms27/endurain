@@ -1,5 +1,7 @@
 # Endurain Trademark Policy
 
+> **Fork notice:** This repository ([schms27/endurain](https://github.com/schms27/endurain)) is an unofficial, non-commercial fork of Endurain ([endurain-project/endurain](https://github.com/endurain-project/endurain)). It is **not the official Endurain project** and is not sponsored or endorsed by the Endurain project or its Owner. The policy below is the upstream Endurain trademark policy, reproduced unchanged, and applies to this fork.
+
 _Last updated: 03/12/2025_
 
 "**Endurain**" (the **Word Mark**) is a registered trademark of **João Vitória Silva** (the **Owner**).
