@@ -93,6 +93,18 @@ const router = createRouter({
       meta: { requiresAuth: true, cardless: true },
     },
     {
+      path: '/routes',
+      name: 'routes',
+      component: () => import('@/features/routes/views/RoutesView.vue'),
+      meta: { requiresAuth: true, cardless: true },
+    },
+    {
+      path: '/route/:id',
+      name: 'route',
+      component: () => import('@/features/routes/views/RouteDetailView.vue'),
+      meta: { requiresAuth: true, cardless: true },
+    },
+    {
       path: '/activity/:id',
       name: 'activity',
       component: () => import('@/features/activities/views/ActivityDetailView.vue'),

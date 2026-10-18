@@ -4442,6 +4442,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Routes
+         * @description List your routes, newest first.
+         *
+         *     Args:
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         q: Name search.
+         *         activity_type: Only routes for this activity type.
+         *         page_number: 1-based page number.
+         *         num_records: Page size.
+         *
+         *     Returns:
+         *         One page of routes and the total count.
+         */
+        get: operations["list_routes_api_v1_routes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/from_activity/{activity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Route From Activity
+         * @description Save (part of) one of your activities as a route.
+         *
+         *     Args:
+         *         activity_id: Source activity ID.
+         *         request: Optional name and slice.
+         *         _validate_activity_id: Activity ID validator dependency.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The created route.
+         */
+        post: operations["create_route_from_activity_api_v1_routes_from_activity__activity_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Route
+         * @description Import a route from a GPX, TCX or FIT file.
+         *
+         *     Args:
+         *         file: The route file.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The created route.
+         */
+        post: operations["import_route_api_v1_routes_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/{route_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Route
+         * @description Get one of your routes.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The route.
+         */
+        get: operations["read_route_api_v1_routes__route_id__get"];
+        /**
+         * Edit Route
+         * @description Edit one of your routes.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         edit: Changes to apply.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The updated route.
+         */
+        put: operations["edit_route_api_v1_routes__route_id__put"];
+        post?: never;
+        /**
+         * Delete Route
+         * @description Delete one of your routes.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         None.
+         */
+        delete: operations["delete_route_api_v1_routes__route_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/{route_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Route
+         * @description Download one of your routes as a file for a device or another app.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         export_format: Output format (GPX only for now).
+         *
+         *     Returns:
+         *         The file as an attachment.
+         */
+        get: operations["export_route_api_v1_routes__route_id__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/server_settings": {
         parameters: {
             query?: never;
@@ -5930,6 +6108,11 @@ export interface components {
         };
         /** Body_import_profile_data_api_v1_profile_import_post */
         Body_import_profile_data_api_v1_profile_import_post: {
+            /** File */
+            file: string;
+        };
+        /** Body_import_route_api_v1_routes_import_post */
+        Body_import_route_api_v1_routes_import_post: {
             /** File */
             file: string;
         };
@@ -9435,6 +9618,22 @@ export interface components {
          */
         PasswordType: "strict" | "length_only";
         /**
+         * PoiKind
+         * @description Point-of-interest categories on a route.
+         *
+         *     Members:
+         *         GENERIC: Anything else.
+         *         WATER: Drinking water.
+         *         FOOD: Food or restaurant.
+         *         SUMMIT: Summit or peak.
+         *         VIEWPOINT: Scenic viewpoint.
+         *         DANGER: Hazard or caution.
+         *         SHELTER: Hut or shelter.
+         *         TOILET: Toilet or restroom.
+         * @enum {string}
+         */
+        PoiKind: "generic" | "water" | "food" | "summit" | "viewpoint" | "danger" | "shelter" | "toilet";
+        /**
          * ProfileUpdate
          * @description Schema for self-service profile updates.
          *
@@ -9484,6 +9683,196 @@ export interface components {
             units?: components["schemas"]["Units"] | null;
             /** Username */
             username?: string | null;
+        };
+        /**
+         * RouteEdit
+         * @description Editable route attributes.
+         *
+         *     Attributes:
+         *         name: New name.
+         *         description: New description (null clears it).
+         *         activity_type: New intended sport (null clears it).
+         */
+        RouteEdit: {
+            /** Activity Type */
+            activity_type?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name?: string | null;
+        };
+        /**
+         * RouteFromActivity
+         * @description Request to save (part of) an activity as a route.
+         *
+         *     Attributes:
+         *         name: Route name; defaults to the activity name.
+         *         start_index: First lat/lon stream index to keep.
+         *         end_index: Last lat/lon stream index to keep (inclusive).
+         */
+        RouteFromActivity: {
+            /** End Index */
+            end_index?: number | null;
+            /** Name */
+            name?: string | null;
+            /** Start Index */
+            start_index?: number | null;
+        };
+        /**
+         * RoutePoi
+         * @description A point of interest.
+         *
+         *     Attributes:
+         *         name: Display name.
+         *         description: Optional description.
+         *         kind: POI category.
+         *         lat: Latitude.
+         *         lon: Longitude.
+         *         ele: Elevation in metres.
+         */
+        RoutePoi: {
+            /** Description */
+            description?: string | null;
+            /** Ele */
+            ele?: number | null;
+            kind: components["schemas"]["PoiKind"];
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Name */
+            name: string;
+        };
+        /**
+         * RouteRead
+         * @description Full route details.
+         *
+         *     Attributes:
+         *         description: Description.
+         *         source_activity_id: Activity the route was saved from.
+         *         original_filename: Name of the imported file.
+         *         geometry: Simplified ``[[lat, lon, ele | None], ...]`` polyline.
+         *         waypoints: Points of interest.
+         *         elevation_min: Lowest elevation in metres.
+         *         elevation_max: Highest elevation in metres.
+         *         updated_at: Last update timestamp.
+         */
+        RouteRead: {
+            /** Activity Type */
+            activity_type: number | null;
+            /** City */
+            city: string | null;
+            /** Country */
+            country: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string | null;
+            /** Distance */
+            distance: number;
+            /** Elevation Gain */
+            elevation_gain: number | null;
+            /** Elevation Loss */
+            elevation_loss: number | null;
+            /** Elevation Max */
+            elevation_max: number | null;
+            /** Elevation Min */
+            elevation_min: number | null;
+            /** Geometry */
+            geometry: (number | null)[][];
+            /** Id */
+            id: number;
+            /** Is Loop */
+            is_loop: boolean;
+            /** Name */
+            name: string;
+            /** Original Filename */
+            original_filename: string | null;
+            source: components["schemas"]["RouteSource"];
+            /** Source Activity Id */
+            source_activity_id: number | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** User Id */
+            user_id: number;
+            /** Waypoints */
+            waypoints: components["schemas"]["RoutePoi"][];
+        };
+        /**
+         * RouteSource
+         * @description How a route was created.
+         *
+         *     Members:
+         *         IMPORT: Imported from a GPX, TCX or FIT file.
+         *         ACTIVITY: Saved from a recorded activity.
+         * @enum {integer}
+         */
+        RouteSource: 1 | 2;
+        /**
+         * RouteSummary
+         * @description Route fields for lists (no geometry).
+         *
+         *     Attributes:
+         *         id: Route ID.
+         *         user_id: Owner user ID.
+         *         name: Route name.
+         *         activity_type: Intended sport.
+         *         source: How the route was created.
+         *         distance: Length in metres.
+         *         elevation_gain: Elevation gain in metres.
+         *         elevation_loss: Elevation loss in metres.
+         *         is_loop: Whether the route is a loop.
+         *         city: City of the start point.
+         *         country: Country of the start point.
+         *         created_at: Creation timestamp.
+         */
+        RouteSummary: {
+            /** Activity Type */
+            activity_type: number | null;
+            /** City */
+            city: string | null;
+            /** Country */
+            country: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Distance */
+            distance: number;
+            /** Elevation Gain */
+            elevation_gain: number | null;
+            /** Elevation Loss */
+            elevation_loss: number | null;
+            /** Id */
+            id: number;
+            /** Is Loop */
+            is_loop: boolean;
+            /** Name */
+            name: string;
+            source: components["schemas"]["RouteSource"];
+            /** User Id */
+            user_id: number;
+        };
+        /**
+         * RoutesPage
+         * @description One page of routes.
+         *
+         *     Attributes:
+         *         records: Routes on this page.
+         *         total: Total routes matching the filters.
+         */
+        RoutesPage: {
+            /** Records */
+            records: components["schemas"]["RouteSummary"][];
+            /** Total */
+            total: number;
         };
         /**
          * ServerSettingsEdit
@@ -16686,6 +17075,236 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsersRead"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_routes_api_v1_routes_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                activity_type?: number | null;
+                page_number?: number;
+                num_records?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoutesPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_route_from_activity_api_v1_routes_from_activity__activity_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                activity_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteFromActivity"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_route_api_v1_routes_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_route_api_v1_routes_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_route_api_v1_routes__route_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_route_api_v1_routes__route_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_route_api_v1_routes__route_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_route_api_v1_routes__route_id__export_get: {
+        parameters: {
+            query?: {
+                format?: "gpx";
+            };
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/gpx+xml": unknown;
                 };
             };
             /** @description Validation Error */

@@ -1,0 +1,95 @@
+{
+  "title": "Routes",
+  "subtitle": "Planned routes you imported or saved from your activities",
+  "buttonImport": "Import routes",
+  "searchPlaceholder": "Search routes",
+  "clearSearch": "Clear search",
+  "empty": {
+    "title": "No routes yet",
+    "description": "Import a GPX, TCX or FIT file, or save one of your activities as a route.",
+    "searchTitle": "No matching routes",
+    "searchDescription": "Try a different name."
+  },
+  "error": {
+    "title": "Couldn't load routes",
+    "description": "Something went wrong while loading your routes.",
+    "retry": "Try again"
+  },
+  "item": {
+    "loop": "Loop",
+    "fromActivity": "From activity",
+    "imported": "Imported"
+  },
+  "stats": {
+    "distance": "Distance",
+    "elevationGain": "Elevation gain",
+    "elevationLoss": "Elevation loss",
+    "highest": "Highest point",
+    "lowest": "Lowest point",
+    "pois": "Points of interest"
+  },
+  "detail": {
+    "back": "Back to routes",
+    "notFoundTitle": "Route not found",
+    "notFoundDescription": "This route doesn't exist or isn't yours.",
+    "elevation": "Elevation",
+    "noElevation": "This route has no elevation data.",
+    "pointsOfInterest": "Points of interest",
+    "sourceActivity": "Saved from an activity",
+    "viewActivity": "View activity",
+    "importedFrom": "Imported from {filename}"
+  },
+  "actions": {
+    "menu": "Route actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "export": "Download GPX",
+    "exportError": "Couldn't download the route."
+  },
+  "import": {
+    "title": "Import routes",
+    "description": "Choose one or more GPX, TCX or FIT files. Each file becomes a route.",
+    "choose": "Choose files",
+    "accepted": "Accepted: .gpx, .tcx, .fit (up to 20 MB each)",
+    "start": "Import",
+    "cancel": "Cancel",
+    "close": "Close",
+    "progress": "Importing {current} of {total}…",
+    "success": "Imported {count} route | Imported {count} routes",
+    "failed": "Couldn't import {name}",
+    "problem": {
+      "empty": "The file is empty.",
+      "extension": "Unsupported file type.",
+      "size": "The file is too large."
+    }
+  },
+  "edit": {
+    "title": "Edit route",
+    "name": "Name",
+    "description": "Description",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Route updated.",
+    "error": "Couldn't update the route."
+  },
+  "delete": {
+    "title": "Delete route?",
+    "body": "\"{name}\" will be permanently deleted.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Route deleted.",
+    "error": "Couldn't delete the route."
+  },
+  "poi": {
+    "generic": "Point of interest",
+    "water": "Water",
+    "food": "Food",
+    "summit": "Summit",
+    "viewpoint": "Viewpoint",
+    "danger": "Hazard",
+    "shelter": "Shelter",
+    "toilet": "Toilet"
+  }
+}

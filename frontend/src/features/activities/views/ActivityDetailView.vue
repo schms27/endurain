@@ -281,6 +281,7 @@ const notFound = computed(() => !isPending.value && !isError.value && activity.v
           :units="units"
           :current-user-id="currentUserId"
           :owner="owner"
+          :has-gps="trackPoints.length > 1"
         />
         <div class="border-t border-border pt-4">
           <ActivityMetricsGrid :activity="activity" :units="units" :visibility="metricVisibility" />

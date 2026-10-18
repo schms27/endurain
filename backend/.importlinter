@@ -10,6 +10,7 @@ root_packages =
     gears
     health
     notifications
+    routes
     server_settings
     strava
     websocket
@@ -27,6 +28,7 @@ source_modules =
     gears
     health
     notifications
+    routes
     server_settings
     strava
     websocket
@@ -48,6 +50,7 @@ source_modules =
     gears
     health
     notifications
+    routes
     server_settings
     strava
     websocket

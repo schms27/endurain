@@ -1,0 +1,95 @@
+{
+  "title": "Routen",
+  "subtitle": "Geplante Routen, die du importiert oder aus Aktivitäten gespeichert hast",
+  "buttonImport": "Routen importieren",
+  "searchPlaceholder": "Routen suchen",
+  "clearSearch": "Suche löschen",
+  "empty": {
+    "title": "Noch keine Routen",
+    "description": "Importiere eine GPX-, TCX- oder FIT-Datei oder speichere eine deiner Aktivitäten als Route.",
+    "searchTitle": "Keine passenden Routen",
+    "searchDescription": "Versuche einen anderen Namen."
+  },
+  "error": {
+    "title": "Routen konnten nicht geladen werden",
+    "description": "Beim Laden deiner Routen ist ein Fehler aufgetreten.",
+    "retry": "Erneut versuchen"
+  },
+  "item": {
+    "loop": "Rundkurs",
+    "fromActivity": "Aus Aktivität",
+    "imported": "Importiert"
+  },
+  "stats": {
+    "distance": "Distanz",
+    "elevationGain": "Aufstieg",
+    "elevationLoss": "Abstieg",
+    "highest": "Höchster Punkt",
+    "lowest": "Tiefster Punkt",
+    "pois": "Wegpunkte"
+  },
+  "detail": {
+    "back": "Zurück zu den Routen",
+    "notFoundTitle": "Route nicht gefunden",
+    "notFoundDescription": "Diese Route existiert nicht oder gehört dir nicht.",
+    "elevation": "Höhenprofil",
+    "noElevation": "Diese Route hat keine Höhendaten.",
+    "pointsOfInterest": "Wegpunkte",
+    "sourceActivity": "Aus einer Aktivität gespeichert",
+    "viewActivity": "Aktivität anzeigen",
+    "importedFrom": "Importiert aus {filename}"
+  },
+  "actions": {
+    "menu": "Routenaktionen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "export": "GPX herunterladen",
+    "exportError": "Die Route konnte nicht heruntergeladen werden."
+  },
+  "import": {
+    "title": "Routen importieren",
+    "description": "Wähle eine oder mehrere GPX-, TCX- oder FIT-Dateien. Jede Datei wird zu einer Route.",
+    "choose": "Dateien auswählen",
+    "accepted": "Erlaubt: .gpx, .tcx, .fit (jeweils bis 20 MB)",
+    "start": "Importieren",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "progress": "Importiere {current} von {total}…",
+    "success": "{count} Route importiert | {count} Routen importiert",
+    "failed": "{name} konnte nicht importiert werden",
+    "problem": {
+      "empty": "Die Datei ist leer.",
+      "extension": "Nicht unterstützter Dateityp.",
+      "size": "Die Datei ist zu groß."
+    }
+  },
+  "edit": {
+    "title": "Route bearbeiten",
+    "name": "Name",
+    "description": "Beschreibung",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "success": "Route aktualisiert.",
+    "error": "Die Route konnte nicht aktualisiert werden."
+  },
+  "delete": {
+    "title": "Route löschen?",
+    "body": "„{name}“ wird endgültig gelöscht.",
+    "confirm": "Löschen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "success": "Route gelöscht.",
+    "error": "Die Route konnte nicht gelöscht werden."
+  },
+  "poi": {
+    "generic": "Wegpunkt",
+    "water": "Wasser",
+    "food": "Verpflegung",
+    "summit": "Gipfel",
+    "viewpoint": "Aussichtspunkt",
+    "danger": "Gefahrenstelle",
+    "shelter": "Unterstand",
+    "toilet": "Toilette"
+  }
+}

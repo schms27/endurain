@@ -159,7 +159,10 @@
     "cancel": "Cancel",
     "close": "Close",
     "deleteSuccess": "Activity deleted",
-    "deleteError": "Couldn't delete the activity"
+    "deleteError": "Couldn't delete the activity",
+    "saveAsRoute": "Save as route",
+    "saveAsRouteSuccess": "Saved as a route",
+    "saveAsRouteError": "Couldn't save the activity as a route"
   },
   "media": {
     "title": "Photos",

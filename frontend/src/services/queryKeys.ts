@@ -289,6 +289,26 @@ export const queryKeys = {
   },
 
   /**
+   * Planned routes domain. Same shape as {@link queryKeys.gears}: imports,
+   * edits and deletes invalidate `all()` so the library and detail views
+   * refetch.
+   */
+  routes: {
+    /** Broad prefix; invalidating this cascades to every routes query. */
+    all: () => ['routes'] as const,
+    /**
+     * @param filters - Serializable list filters (page, size, search term).
+     * @returns A list query key scoped to the given filters.
+     */
+    list: (filters: Record<string, unknown> = {}) => ['routes', 'list', filters] as const,
+    /**
+     * @param id - Route identifier.
+     * @returns A detail query key for a single route.
+     */
+    detail: (id: number) => ['routes', 'detail', id] as const,
+  },
+
+  /**
    * Users administration domain (admin settings zone). Same shape as
    * {@link queryKeys.notifications}: `all()` is the broad prefix the create/
    * update/delete mutations invalidate on settle so every list, the username
