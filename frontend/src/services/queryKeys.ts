@@ -306,6 +306,23 @@ export const queryKeys = {
      * @returns A detail query key for a single route.
      */
     detail: (id: number) => ['routes', 'detail', id] as const,
+    /**
+     * @param userId - Profile user identifier.
+     * @param filters - Serializable pagination (page, size).
+     * @returns A key for the routes listed on a user's profile.
+     */
+    user: (userId: number, filters: Record<string, unknown> = {}) =>
+      ['routes', 'user', userId, filters] as const,
+    /**
+     * @param ref - Share-link token or public id, as a stable string.
+     * @returns A key for a route opened through a link or anonymously.
+     */
+    shared: (ref: string) => ['routes', 'shared', ref] as const,
+    /**
+     * @param id - Route identifier.
+     * @returns A key for the owner's home-location warning.
+     */
+    homeWarning: (id: number) => ['routes', 'homeWarning', id] as const,
   },
 
   /**

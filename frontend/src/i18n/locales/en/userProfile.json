@@ -22,7 +22,8 @@
   "tabs": {
     "activities": "Activities",
     "following": "Following",
-    "followers": "Followers"
+    "followers": "Followers",
+    "routes": "Routes"
   },
   "activitiesError": {
     "title": "Couldn't load activities",

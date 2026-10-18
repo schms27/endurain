@@ -13,10 +13,12 @@ import core.file_uploads as core_file_uploads
 import routes.constants as routes_constants
 import routes.route.crud as route_crud
 import routes.route.export as route_export
+import routes.route.public_router as route_public_router
 import routes.route.schema as route_schema
-import routes.route.utils as route_utils
 
 router = APIRouter()
+# Mounted under /users: the routes listed on a user's profile.
+user_router = APIRouter()
 
 
 async def _read_route_file(file: UploadFile) -> tuple[bytes, str]:
@@ -147,7 +149,7 @@ async def read_route(
     db: Annotated[Session, Depends(core_database.get_db)],
 ) -> route_schema.RouteRead:
     """
-    Get one of your routes.
+    Get a route you own or can see (trimmed for non-owners).
 
     Args:
         route_id: Route ID.
@@ -220,7 +222,7 @@ async def export_route(
     export_format: Annotated[Literal["gpx"], Query(alias="format")] = "gpx",
 ) -> Response:
     """
-    Download one of your routes as a file for a device or another app.
+    Download a route you can see as a file for a device or another app.
 
     Args:
         route_id: Route ID.
@@ -230,12 +232,159 @@ async def export_route(
         export_format: Output format (GPX only for now).
 
     Returns:
-        The file as an attachment.
+        The file as an attachment, trimmed for non-owners.
     """
-    route = route_crud.get_owned_route_model(route_id, token_user_id, db)
-    filename = route_utils.export_filename(route.name, export_format)
-    return Response(
-        content=route_export.to_gpx(route),
-        media_type="application/gpx+xml",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    return route_export.gpx_response(route_crud.get_route(route_id, token_user_id, db))
+
+
+@router.post(
+    "/{route_id}/copy",
+    response_model=route_schema.RouteRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def copy_route(
+    route_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:write"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+) -> route_schema.RouteRead:
+    """
+    Save a route you can see to your routes, as a private copy.
+
+    Args:
+        route_id: Route ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+
+    Returns:
+        The new route.
+    """
+    route = route_crud.get_visible_route_model(route_id, token_user_id, db)
+    return route_crud.copy_route(route, token_user_id, db)
+
+
+@router.post(
+    "/shared/{token}/copy",
+    response_model=route_schema.RouteRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def copy_shared_route(
+    token: route_public_router.ShareToken,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:write"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+) -> route_schema.RouteRead:
+    """
+    Save a route shared with you by link to your routes, as a private copy.
+
+    Args:
+        token: Share token from the link.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+
+    Returns:
+        The new route.
+    """
+    route = route_crud.get_shared_route_model(token, db)
+    return route_crud.copy_route(route, token_user_id, db)
+
+
+@router.post("/{route_id}/share_token", response_model=route_schema.RouteRead)
+async def create_share_token(
+    route_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:write"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+) -> route_schema.RouteRead:
+    """
+    Create or rotate the unlisted share link of one of your routes.
+
+    Args:
+        route_id: Route ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+
+    Returns:
+        The route with its new share token.
+    """
+    return route_crud.create_share_token(route_id, token_user_id, db)
+
+
+@router.delete("/{route_id}/share_token", response_model=route_schema.RouteRead)
+async def revoke_share_token(
+    route_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:write"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+) -> route_schema.RouteRead:
+    """
+    Revoke the unlisted share link of one of your routes.
+
+    Args:
+        route_id: Route ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+
+    Returns:
+        The route without a share token.
+    """
+    return route_crud.revoke_share_token(route_id, token_user_id, db)
+
+
+@router.get("/{route_id}/home_warning", response_model=route_schema.RouteHomeWarning)
+async def read_home_warning(
+    route_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:read"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+) -> route_schema.RouteHomeWarning:
+    """
+    Check whether one of your routes starts or ends near where many of your
+    activities start, which may reveal where you live.
+
+    Args:
+        route_id: Route ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+
+    Returns:
+        Which visible endpoints are flagged.
+    """
+    return route_crud.home_location_warning(route_id, token_user_id, db)
+
+
+@user_router.get("/{user_id}/routes", response_model=route_schema.RoutesPage)
+async def list_user_routes(
+    user_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["routes:read"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+    page_number: Annotated[int, Query(ge=1)] = 1,
+    num_records: Annotated[int, Query(ge=1, le=100)] = 25,
+) -> route_schema.RoutesPage:
+    """
+    List a user's routes that you can see, newest first.
+
+    Args:
+        user_id: Profile user ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+        page_number: 1-based page number.
+        num_records: Page size.
+
+    Returns:
+        One page of routes and the total count.
+    """
+    return route_crud.list_user_routes(
+        user_id,
+        token_user_id,
+        db,
+        page_number=page_number,
+        num_records=num_records,
     )

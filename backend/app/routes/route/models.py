@@ -16,8 +16,12 @@ class Route(TimestampMixin, Base):
         name: Route name.
         description: Optional description.
         activity_type: Intended sport (activity type code).
+        visibility: Who can see the route (see RouteVisibility).
+        share_token: Secret for the unlisted "anyone with the link" URL.
+        hide_endpoints_m: Metres trimmed from both ends for non-owners.
         source: How the route was created (see RouteSource).
         source_activity_id: Activity the route was saved from.
+        source_route_id: Route this one was copied from.
         original_filename: Name of the imported file.
         geometry: Simplified ``[[lat, lon, ele | None], ...]`` polyline.
         waypoints: Points of interest.
@@ -43,7 +47,10 @@ class Route(TimestampMixin, Base):
     """
 
     __tablename__ = "routes"
-    __table_args__ = (Index("ix_routes_user_id_created_at", "user_id", "created_at"),)
+    __table_args__ = (
+        Index("ix_routes_user_id_created_at", "user_id", "created_at"),
+        Index("ix_routes_share_token", "share_token", unique=True),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
@@ -54,11 +61,39 @@ class Route(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(250), nullable=False, comment="Route name")
     description: Mapped[str | None] = mapped_column(String(2500), nullable=True, comment="Route description")
     activity_type: Mapped[int | None] = mapped_column(nullable=True, comment="Intended activity type")
-    source: Mapped[int] = mapped_column(SmallInteger, nullable=False, comment="1 - import, 2 - activity")
+    visibility: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=2,
+        server_default="2",
+        comment="0 - public, 1 - followers, 2 - private",
+    )
+    share_token: Mapped[str | None] = mapped_column(
+        String(43),
+        nullable=True,
+        comment="Unlisted share link token",
+    )
+    hide_endpoints_m: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=0,
+        server_default="0",
+        comment="Metres hidden at both ends for non-owners",
+    )
+    source: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        comment="1 - import, 2 - activity, 4 - copy",
+    )
     source_activity_id: Mapped[int | None] = mapped_column(
         ForeignKey("activities.id", ondelete="SET NULL"),
         nullable=True,
         comment="Activity the route was saved from",
+    )
+    source_route_id: Mapped[int | None] = mapped_column(
+        ForeignKey("routes.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="Route this one was copied from",
     )
     original_filename: Mapped[str | None] = mapped_column(
         String(250),

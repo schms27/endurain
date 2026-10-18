@@ -60,6 +60,38 @@ _NUMERIC_SORT_COLUMNS = {
 }
 
 
+def owner_visibility_condition(model, requester_user_id: int | None):
+    """Build the visibility-code condition for rows another user owns.
+
+    Shared by activities and any other owned model with ``visibility``
+    (0 public, 1 followers, 2 private) and ``user_id`` columns, such as
+    planned routes.
+
+    Args:
+        model: Mapped class with ``visibility`` and ``user_id`` columns.
+        requester_user_id: Requesting user ID, or None for an
+            anonymous/public-only read.
+
+    Returns:
+        SQLAlchemy condition limiting rows to public or accepted
+        follower-visible ones.
+    """
+    visibility_conditions = [model.visibility == 0]
+    if requester_user_id is not None:
+        accepted_follower_exists = (
+            select(followers_models.Follower.follower_id)
+            .where(
+                followers_models.Follower.follower_id == requester_user_id,
+                followers_models.Follower.following_id == model.user_id,
+                followers_models.Follower.is_accepted.is_(True),
+            )
+            .correlate(model)
+            .exists()
+        )
+        visibility_conditions.append(and_(model.visibility == 1, accepted_follower_exists))
+    return or_(*visibility_conditions)
+
+
 def _visible_to_requester_condition(requester_user_id: int | None):
     """Build the non-owner activity visibility condition.
 
@@ -71,30 +103,11 @@ def _visible_to_requester_condition(requester_user_id: int | None):
         SQLAlchemy condition limiting rows to public or accepted
         follower-visible activities that were not synced from Strava.
     """
-    visibility_conditions = [activities_models.Activity.visibility == 0]
-    if requester_user_id is not None:
-        accepted_follower_exists = (
-            select(followers_models.Follower.follower_id)
-            .where(
-                followers_models.Follower.follower_id == requester_user_id,
-                followers_models.Follower.following_id == activities_models.Activity.user_id,
-                followers_models.Follower.is_accepted.is_(True),
-            )
-            .correlate(activities_models.Activity)
-            .exists()
-        )
-        visibility_conditions.append(
-            and_(
-                activities_models.Activity.visibility == 1,
-                accepted_follower_exists,
-            )
-        )
-
     return and_(
         activities_models.Activity.is_hidden.is_(False),
         # Strava's API terms only allow showing Strava data to its owner.
         activities_models.Activity.strava_activity_id.is_(None),
-        or_(*visibility_conditions),
+        owner_visibility_condition(activities_models.Activity, requester_user_id),
     )
 
 

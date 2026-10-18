@@ -11,10 +11,28 @@ class RouteSource(IntEnum):
     Members:
         IMPORT: Imported from a GPX, TCX or FIT file.
         ACTIVITY: Saved from a recorded activity.
+        COPY: Copied from another user's shared route.
     """
 
     IMPORT = 1
     ACTIVITY = 2
+    COPY = 4
+
+
+class RouteVisibility(IntEnum):
+    """
+    Who can see a route; same codes as activity visibility.
+
+    Members:
+        PUBLIC: Every signed-in user, and anonymous visitors when public
+            shareable links are enabled.
+        FOLLOWERS: Accepted followers of the owner.
+        PRIVATE: Only the owner.
+    """
+
+    PUBLIC = 0
+    FOLLOWERS = 1
+    PRIVATE = 2
 
 
 class PoiKind(StrEnum):
@@ -67,6 +85,16 @@ SIMPLIFY_TOLERANCE_M: Final[float] = 1.0
 
 # A route whose start and end are this close is a loop.
 LOOP_THRESHOLD_M: Final[float] = 100.0
+
+# Sharing.
+SHARE_TOKEN_BYTES: Final[int] = 32
+SHARE_TOKEN_LENGTH: Final[int] = 43
+MAX_HIDE_ENDPOINTS_M: Final[int] = 2000
+
+# Home-location warning: a route endpoint this close to the start of at least
+# HOME_MIN_ACTIVITIES of the owner's activities probably reveals where they live.
+HOME_RADIUS_M: Final[float] = 200.0
+HOME_MIN_ACTIVITIES: Final[int] = 3
 
 # FIT positions are stored in semicircles.
 FIT_SEMICIRCLES_TO_DEGREES: Final[float] = 180.0 / 2**31

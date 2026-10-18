@@ -36,6 +36,7 @@ import health.health_water.router as health_water_router
 import health.health_weight.router as health_weight_router
 import health.router as health_router
 import notifications.router as notifications_router
+import routes.route.public_router as routes_public_router
 import routes.route.router as routes_router
 import segments.segment.router as segments_router
 import segments.segment_efforts.router as segment_efforts_router
@@ -323,6 +324,12 @@ router.include_router(
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
+    routes_router.user_router,
+    prefix=core_config.ROOT_PATH + "/users",
+    tags=["routes"],
+    dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
     websocket_router.router,
     prefix=core_config.ROOT_PATH + "/ws",
     tags=["websocket"],
@@ -363,6 +370,11 @@ router.include_router(
     identity_providers_public_router.router,
     prefix=core_config.ROOT_PATH + "/public/idp",
     tags=["identity_providers_public"],
+)
+router.include_router(
+    routes_public_router.router,
+    prefix=core_config.ROOT_PATH + "/public/routes",
+    tags=["public_routes"],
 )
 router.include_router(
     server_settings_public_router.router,

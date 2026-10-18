@@ -39,11 +39,15 @@ class RouteEdit(BaseModel):
         name: New name.
         description: New description (null clears it).
         activity_type: New intended sport (null clears it).
+        visibility: Who can see the route.
+        hide_endpoints_m: Metres hidden at both ends for non-owners.
     """
 
     name: str | None = Field(default=None, min_length=1, max_length=250)
     description: str | None = Field(default=None, max_length=2500)
     activity_type: StrictInt | None = Field(default=None, gt=0)
+    visibility: routes_constants.RouteVisibility | None = None
+    hide_endpoints_m: StrictInt | None = Field(default=None, ge=0, le=routes_constants.MAX_HIDE_ENDPOINTS_M)
 
     model_config = ConfigDict(extra="forbid")
 
@@ -79,7 +83,8 @@ class RouteSummary(BaseModel):
         name: Route name.
         activity_type: Intended sport.
         source: How the route was created.
-        distance: Length in metres.
+        visibility: Who can see the route.
+        distance: Length in metres (after endpoint trimming for non-owners).
         elevation_gain: Elevation gain in metres.
         elevation_loss: Elevation loss in metres.
         is_loop: Whether the route is a loop.
@@ -93,6 +98,7 @@ class RouteSummary(BaseModel):
     name: str
     activity_type: StrictInt | None
     source: routes_constants.RouteSource
+    visibility: routes_constants.RouteVisibility
     distance: float
     elevation_gain: StrictInt | None
     elevation_loss: StrictInt | None
@@ -108,10 +114,17 @@ class RouteRead(RouteSummary):
     """
     Full route details.
 
+    Non-owners get the trimmed geometry and no owner-only fields (share
+    token, source activity, file name).
+
     Attributes:
         description: Description.
-        source_activity_id: Activity the route was saved from.
-        original_filename: Name of the imported file.
+        source_activity_id: Activity the route was saved from (owner only).
+        source_route_id: Route this one was copied from.
+        original_filename: Name of the imported file (owner only).
+        share_token: Unlisted link token (owner only).
+        hide_endpoints_m: Metres hidden at both ends for non-owners.
+        is_owner: Whether the requester owns the route.
         geometry: Simplified ``[[lat, lon, ele | None], ...]`` polyline.
         waypoints: Points of interest.
         elevation_min: Lowest elevation in metres.
@@ -121,7 +134,11 @@ class RouteRead(RouteSummary):
 
     description: str | None
     source_activity_id: StrictInt | None
+    source_route_id: StrictInt | None
     original_filename: str | None
+    share_token: str | None
+    hide_endpoints_m: StrictInt
+    is_owner: bool = False
     geometry: list[list[float | None]]
     waypoints: list[RoutePoi]
     elevation_min: StrictInt | None
@@ -140,3 +157,46 @@ class RoutesPage(BaseModel):
 
     records: list[RouteSummary]
     total: StrictInt
+
+
+class RouteOwner(BaseModel):
+    """
+    Public details of a route's creator.
+
+    Attributes:
+        id: User ID.
+        name: Display name.
+        username: Username.
+    """
+
+    id: StrictInt
+    name: str
+    username: str
+
+
+class PublicRouteRead(RouteRead):
+    """
+    A route as shown on its public page.
+
+    Attributes:
+        owner: The creator, only when the server shares user info on
+            public links.
+    """
+
+    owner: RouteOwner | None = None
+
+
+class RouteHomeWarning(BaseModel):
+    """
+    Whether a route's visible endpoints may reveal where the owner lives.
+
+    An endpoint is flagged when several of the owner's activities start
+    close to it.
+
+    Attributes:
+        start_near_home: The visible start is near a frequent activity start.
+        end_near_home: The visible end is near a frequent activity start.
+    """
+
+    start_near_home: bool
+    end_near_home: bool

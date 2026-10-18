@@ -22,7 +22,8 @@
   "tabs": {
     "activities": "Aktivitäten",
     "following": "Gefolgt",
-    "followers": "Follower"
+    "followers": "Follower",
+    "routes": "Routen"
   },
   "activitiesError": {
     "title": "Aktivitäten konnten nicht geladen werden",

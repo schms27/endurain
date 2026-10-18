@@ -102,7 +102,16 @@ const router = createRouter({
       path: '/route/:id',
       name: 'route',
       component: () => import('@/features/routes/views/RouteDetailView.vue'),
-      meta: { requiresAuth: true, cardless: true },
+      // Auth-optional: anonymous visitors see public routes when the server
+      // allows public shareable links.
+      meta: { requiresAuth: false, cardless: true },
+    },
+    {
+      path: '/r/:token',
+      name: 'shared-route',
+      component: () => import('@/features/routes/views/RouteDetailView.vue'),
+      // Auth-optional: unlisted share links work for anyone with the link.
+      meta: { requiresAuth: false, cardless: true },
     },
     {
       path: '/segment/:id',
