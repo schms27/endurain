@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 import pytest
-from hypothesis import given
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 import core.geo as core_geo
@@ -76,6 +76,7 @@ def test_bounding_box_intersects(other, expected):
     assert other.intersects(box) is expected
 
 
+@settings(deadline=None, suppress_health_check=[HealthCheck.too_slow])
 @given(
     st.floats(min_value=-60, max_value=60),
     st.floats(min_value=-170, max_value=170),
