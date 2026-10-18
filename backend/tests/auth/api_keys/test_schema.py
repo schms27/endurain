@@ -74,21 +74,21 @@ class TestUsersApiKeyCreate:
             )
         assert "Unsupported API key scopes" in str(exc_info.value)
 
-    def test_create_profile_scope_fails(self):
-        """Test that JWT-only scopes are rejected for API keys."""
-        with pytest.raises(ValidationError) as exc_info:
-            users_api_keys_schema.UsersApiKeyCreate(
-                name="Profile Key",
-                scopes=["profile"],
-            )
-        assert "Unsupported API key scopes" in str(exc_info.value)
+    def test_create_read_scopes_succeeds(self):
+        """Test that the read-only API-key scopes are accepted."""
+        scopes = ["profile", "activities:read", "gears:read", "health:read"]
+        key = users_api_keys_schema.UsersApiKeyCreate(
+            name="Home Assistant",
+            scopes=scopes,
+        )
+        assert key.scopes == scopes
 
-    def test_create_multiple_scopes_with_unsupported_fails(self):
-        """Test that only activities:upload is accepted for API keys."""
+    def test_create_write_scope_fails(self):
+        """Test that JWT-only write scopes are rejected for API keys."""
         with pytest.raises(ValidationError) as exc_info:
             users_api_keys_schema.UsersApiKeyCreate(
-                name="Multi-scope Key",
-                scopes=["activities:read", "activities:upload", "gears:read"],
+                name="Write Key",
+                scopes=["activities:read", "activities:write"],
             )
         assert "Unsupported API key scopes" in str(exc_info.value)
 

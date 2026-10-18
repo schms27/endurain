@@ -3061,7 +3061,7 @@ export interface paths {
          * @description Retrieve authenticated user profile with integrations.
          *
          *     Args:
-         *         token_user_id: User ID from access token.
+         *         token_user_id: User ID from access token or API key.
          *         db: Database session.
          *
          *     Returns:
@@ -11980,7 +11980,7 @@ export interface components {
          *
          *     Attributes:
          *         name: User-friendly label for the key.
-         *         scopes: List containing the supported API key scope.
+         *         scopes: List of supported API key scopes.
          *         expires_at: Optional expiration datetime.
          *             None means the key never expires.
          *         current_password: Caller's existing password
@@ -14304,6 +14304,7 @@ export interface operations {
                 name_search?: string | null;
                 sort_by?: string | null;
                 sort_order?: string | null;
+                api_key?: string | null;
                 activity_type?: number | null;
             };
             header?: never;
@@ -14369,7 +14370,9 @@ export interface operations {
     };
     read_activities_user_activities_this_month_stats_api_v1_activities_user__user_id__thismonth_stats_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path: {
                 user_id: number;
@@ -14400,7 +14403,9 @@ export interface operations {
     };
     read_activities_user_activities_this_week_stats_api_v1_activities_user__user_id__thisweek_stats_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path: {
                 user_id: number;
@@ -14858,6 +14863,7 @@ export interface operations {
                 year?: number | null;
                 /** @description Filter summary by activity type name. */
                 type?: string | null;
+                api_key?: string | null;
             };
             header?: never;
             path: {
@@ -15719,6 +15725,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by inactive status */
                 show_inactive?: boolean | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16373,6 +16380,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16524,6 +16532,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16648,7 +16657,9 @@ export interface operations {
     };
     read_health_targets_all_api_v1_health_targets_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -16662,6 +16673,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthTargetsRead"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -16839,6 +16859,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -17296,7 +17317,9 @@ export interface operations {
     };
     read_users_me_api_v1_profile_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -17310,6 +17333,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsersMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
