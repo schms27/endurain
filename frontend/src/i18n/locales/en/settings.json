@@ -767,6 +767,30 @@
     "title": "Import",
     "subtitle": "Import activities and gear from files or a Strava bulk export",
     "beta": "Beta",
+    "auto": {
+      "title": "Automatic import",
+      "subtitle": "Regularly import activity files dropped into your own folder on the server",
+      "enable": "Enable automatic import",
+      "folderHint": "Put .fit, .gpx, .tcx or .gz files in this folder inside the server's activity files directory:",
+      "interval": "Check for new files",
+      "intervals": {
+        "15": "Every 15 minutes",
+        "30": "Every 30 minutes",
+        "60": "Every hour",
+        "180": "Every 3 hours",
+        "360": "Every 6 hours",
+        "720": "Every 12 hours",
+        "1440": "Once a day"
+      },
+      "neverRun": "Not run yet",
+      "lastRun": "Last run {when}: {imported} imported, {failed} failed",
+      "pending": "Files waiting: {count}",
+      "runNow": "Import now",
+      "started": "Importing files from your folder in the background…",
+      "alreadyRunning": "An import of your folder is already running.",
+      "runError": "Couldn't start the import. Please try again.",
+      "saveError": "Couldn't save the automatic import settings. Please try again."
+    },
     "bulk": {
       "title": "Bulk import",
       "subtitle": "Import activity files placed in the server's bulk-import folder",

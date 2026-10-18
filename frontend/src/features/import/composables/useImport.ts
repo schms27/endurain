@@ -1,11 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { storeToRefs } from 'pinia'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+
+import type { AutoImportSettings, AutoImportSettingsInput } from '@/features/import/types'
 
 import { queryKeys } from '@/services/queryKeys'
+import { useAuthStore } from '@/features/auth/stores/auth'
 import {
   bulkImportActivities,
+  fetchAutoImportSettings,
   importStravaActivities,
   importStravaBikes,
   importStravaShoes,
+  runAutoImportNow,
+  updateAutoImportSettings,
 } from '@/features/import/services/import'
 
 /** Bulk-imports activity files from the server's bulk-import folder (background). */
@@ -38,4 +45,30 @@ export function useImportStravaShoesMutation() {
       void client.invalidateQueries({ queryKey: queryKeys.gears.all() })
     },
   })
+}
+
+/** The user's scheduled auto-import settings, gated on authentication. */
+export function useAutoImportSettingsQuery() {
+  const { isAuthenticated } = storeToRefs(useAuthStore())
+  return useQuery({
+    queryKey: queryKeys.profile.autoImport(),
+    queryFn: ({ signal }) => fetchAutoImportSettings(signal),
+    enabled: isAuthenticated,
+  })
+}
+
+/** Saves the auto-import settings and writes the result into the cache. */
+export function useUpdateAutoImportSettingsMutation() {
+  const client = useQueryClient()
+  return useMutation<AutoImportSettings, Error, AutoImportSettingsInput>({
+    mutationFn: (input) => updateAutoImportSettings(input),
+    onSuccess: (saved) => {
+      client.setQueryData(queryKeys.profile.autoImport(), saved)
+    },
+  })
+}
+
+/** Starts a scan of the auto-import folder now (background). */
+export function useRunAutoImportMutation() {
+  return useMutation<void, Error, void>({ mutationFn: () => runAutoImportNow() })
 }

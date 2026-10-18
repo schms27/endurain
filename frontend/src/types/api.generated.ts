@@ -3160,6 +3160,79 @@ export interface paths {
         patch: operations["revoke_user_api_key_api_v1_profile_api_keys__api_key_id__revoke_patch"];
         trace?: never;
     };
+    "/api/v1/profile/auto_import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Auto Import Settings
+         * @description Retrieve the authenticated user's auto import settings and status.
+         *
+         *     Args:
+         *         token_user_id: User ID from access token.
+         *         db: Database session dependency.
+         *
+         *     Returns:
+         *         Settings (defaults when never saved), folder and last-run status.
+         */
+        get: operations["read_auto_import_settings_api_v1_profile_auto_import_get"];
+        /**
+         * Edit Auto Import Settings
+         * @description Update the authenticated user's auto import settings.
+         *
+         *     Creates the user's import folder when enabling.
+         *
+         *     Args:
+         *         settings: New settings.
+         *         token_user_id: User ID from access token.
+         *         db: Database session dependency.
+         *
+         *     Returns:
+         *         The saved settings and status.
+         */
+        put: operations["edit_auto_import_settings_api_v1_profile_auto_import_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profile/auto_import/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Auto Import Now
+         * @description Scan the authenticated user's import folder now, in the background.
+         *
+         *     Works whether or not the schedule is enabled.
+         *
+         *     Args:
+         *         token_user_id: User ID from access token.
+         *         _check_scopes: Scope validation dependency.
+         *
+         *     Returns:
+         *         Confirmation that the scan was queued.
+         *
+         *     Raises:
+         *         HTTPException: 409 if a scan for this user is already running.
+         */
+        post: operations["run_auto_import_now_api_v1_profile_auto_import_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/profile/default_gear": {
         parameters: {
             query?: never;
@@ -6335,6 +6408,60 @@ export interface components {
             target_value?: number | null;
             /** Weight Display Unit */
             weight_display_unit?: string | null;
+        };
+        /**
+         * AutoImportSettingsRead
+         * @description Settings plus folder and last-run status, as shown in the UI.
+         *
+         *     Attributes:
+         *         enabled: Whether the import folder is scanned on a schedule.
+         *         interval_minutes: Minutes between two scans.
+         *         folder: Import folder path, relative to the server's files
+         *             directory.
+         *         pending_files: Supported files currently waiting in the folder.
+         *         last_run_at: When the last scan started, if ever.
+         *         last_run_imported: Files imported by the last scan.
+         *         last_run_failed: Files that failed in the last scan.
+         */
+        AutoImportSettingsRead: {
+            /** Enabled */
+            enabled: boolean;
+            /** Folder */
+            folder: string;
+            /** Interval Minutes */
+            interval_minutes: number;
+            /** Last Run At */
+            last_run_at?: string | null;
+            /**
+             * Last Run Failed
+             * @default 0
+             */
+            last_run_failed: number;
+            /**
+             * Last Run Imported
+             * @default 0
+             */
+            last_run_imported: number;
+            /** Pending Files */
+            pending_files: number;
+        };
+        /**
+         * AutoImportSettingsUpdate
+         * @description Settings a user can change.
+         *
+         *     Attributes:
+         *         enabled: Whether the import folder is scanned on a schedule.
+         *         interval_minutes: Minutes between two scans; one of
+         *             ``ALLOWED_INTERVALS_MINUTES``.
+         */
+        AutoImportSettingsUpdate: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Interval Minutes
+             * @default 60
+             */
+            interval_minutes: number;
         };
         /** Body_create_activity_with_uploaded_file_api_v1_activities_create_upload_post */
         Body_create_activity_with_uploaded_file_api_v1_activities_create_upload_post: {
@@ -16421,6 +16548,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_auto_import_settings_api_v1_profile_auto_import_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutoImportSettingsRead"];
+                };
+            };
+        };
+    };
+    edit_auto_import_settings_api_v1_profile_auto_import_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutoImportSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutoImportSettingsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_auto_import_now_api_v1_profile_auto_import_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
                 };
             };
         };
