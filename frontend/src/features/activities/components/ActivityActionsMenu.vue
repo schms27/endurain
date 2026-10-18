@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { EllipsisVertical, ImagePlus, Pencil, Trash2 } from '@lucide/vue'
+import { EllipsisVertical, ImagePlus, Pencil, Route as RouteIcon, Trash2 } from '@lucide/vue'
 
 import type { Activity } from '@/features/activities/types'
 
@@ -20,17 +20,24 @@ import {
   useUploadActivityMediaMutation,
 } from '@/features/activities/composables/useActivityDetail'
 import ActivityEditDialog from '@/features/activities/components/ActivityEditDialog.vue'
+import { useCreateRouteFromActivityMutation } from '@/features/routes/composables/useRoutes'
 
-const props = defineProps<{
-  /** The activity these owner-only actions apply to. */
-  activity: Activity
-}>()
+const props = withDefaults(
+  defineProps<{
+    /** The activity these owner-only actions apply to. */
+    activity: Activity
+    /** Whether the activity has a GPS track (enables "Save as route"). */
+    hasGps?: boolean
+  }>(),
+  { hasGps: false },
+)
 
 const { t } = useI18n()
 const router = useRouter()
 const toasts = useToasts()
 
 const deleteMutation = useDeleteActivityMutation()
+const saveAsRouteMutation = useCreateRouteFromActivityMutation()
 const uploadMutation = useUploadActivityMediaMutation(() => props.activity.id)
 const isDeleteOpen = ref(false)
 const isEditOpen = ref(false)
@@ -58,6 +65,17 @@ async function onFileSelected(event: Event): Promise<void> {
     toasts.success(t('activities.media.uploadSuccess'))
   } catch {
     toasts.error(t('activities.media.uploadError'))
+  }
+}
+
+/** Copies the activity's GPS track into a new route, then opens it. */
+async function saveAsRoute(): Promise<void> {
+  try {
+    const created = await saveAsRouteMutation.mutateAsync(props.activity.id)
+    toasts.success(t('activities.actions.saveAsRouteSuccess'))
+    await router.push({ name: 'route', params: { id: created.id } })
+  } catch {
+    toasts.error(t('activities.actions.saveAsRouteError'))
   }
 }
 
@@ -90,6 +108,14 @@ async function confirmDelete(): Promise<void> {
       <DropdownMenuItem @select="isEditOpen = true">
         <Pencil class="size-4" />
         <span>{{ t('activities.actions.edit') }}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        v-if="hasGps"
+        :disabled="saveAsRouteMutation.isPending.value"
+        @select="saveAsRoute"
+      >
+        <RouteIcon class="size-4" />
+        <span>{{ t('activities.actions.saveAsRoute') }}</span>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem

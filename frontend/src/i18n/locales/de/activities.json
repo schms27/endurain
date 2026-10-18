@@ -154,7 +154,10 @@
     "cancel": "Abbrechen",
     "close": "Schließen",
     "deleteSuccess": "Aktivität gelöscht",
-    "deleteError": "Aktivität konnte nicht gelöscht werden"
+    "deleteError": "Aktivität konnte nicht gelöscht werden",
+    "saveAsRoute": "Als Route speichern",
+    "saveAsRouteSuccess": "Als Route gespeichert",
+    "saveAsRouteError": "Die Aktivität konnte nicht als Route gespeichert werden"
   },
   "media": {
     "title": "Fotos",

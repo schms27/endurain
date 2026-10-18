@@ -10,6 +10,7 @@ root_packages =
     gears
     health
     notifications
+    routes
     segments
     server_settings
     strava
@@ -28,6 +29,7 @@ source_modules =
     gears
     health
     notifications
+    routes
     segments
     server_settings
     strava
@@ -50,6 +52,7 @@ source_modules =
     gears
     health
     notifications
+    routes
     segments
     server_settings
     strava

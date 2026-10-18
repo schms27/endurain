@@ -25,6 +25,8 @@ const props = defineProps<{
   currentUserId: number | null
   /** Owner identity, when known (e.g. the viewer's own activity). */
   owner?: ActivityOwner | null
+  /** Whether the activity has a GPS track (enables "Save as route"). */
+  hasGps?: boolean
 }>()
 
 const { t, locale } = useI18n()
@@ -147,7 +149,7 @@ const showPrivateNotes = computed(
         >
           <img :src="INTEGRATION_LOGOS.garminApp" alt="" class="size-5 rounded object-contain" />
         </a>
-        <ActivityActionsMenu v-if="isOwner" :activity="activity" />
+        <ActivityActionsMenu v-if="isOwner" :activity="activity" :has-gps="hasGps" />
       </div>
     </div>
 

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { RouterLink, useRouter, type RouteLocationRaw } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Activity, Calendar, LogOut, Search, Settings, User } from '@lucide/vue'
+import { Activity, Calendar, LogOut, Route as RouteIcon, Search, Settings, User } from '@lucide/vue'
 
 import LocaleSwitcher from '@/components/LocaleSwitcher.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
@@ -61,7 +61,7 @@ async function signOut(): Promise<void> {
         </RouterLink>
       </Card>
 
-      <!-- Activities / Summary -->
+      <!-- Activities / Summary / Routes -->
       <Card padding="none" class="overflow-hidden">
         <RouterLink
           :to="{ name: 'activities' }"
@@ -77,6 +77,14 @@ async function signOut(): Promise<void> {
         >
           <Calendar class="size-4" />
           <span>{{ t('nav.summary') }}</span>
+        </RouterLink>
+        <hr class="border-border" />
+        <RouterLink
+          :to="{ name: 'routes' }"
+          class="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-accent hover:text-accent-foreground"
+        >
+          <RouteIcon class="size-4" />
+          <span>{{ t('nav.routes') }}</span>
         </RouterLink>
       </Card>
 

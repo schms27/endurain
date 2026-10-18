@@ -35,6 +35,7 @@ import health.health_water.router as health_water_router
 import health.health_weight.router as health_weight_router
 import health.router as health_router
 import notifications.router as notifications_router
+import routes.route.router as routes_router
 import segments.segment.router as segments_router
 import segments.segment_efforts.router as segment_efforts_router
 import server_settings.public_router as server_settings_public_router
@@ -121,6 +122,12 @@ router.include_router(
     activity_summaries_router.router,
     prefix=core_config.ROOT_PATH + "/activities_summaries",
     tags=["summaries"],
+    dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    routes_router.router,
+    prefix=core_config.ROOT_PATH + "/routes",
+    tags=["routes"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
