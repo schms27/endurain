@@ -36,6 +36,9 @@ class ServerSettings(Base):
             for regular users.
         password_length_admin_users: Min password length for
             admin users.
+        segments_enabled: Enable segments and segment matching.
+        segments_public_creation: Who may create public segments
+            (all, admins).
     """
 
     __tablename__ = "server_settings"
@@ -147,6 +150,17 @@ class ServerSettings(Base):
         default=12,
         nullable=False,
         comment="Minimum password length for admin users",
+    )
+    segments_enabled: Mapped[bool] = mapped_column(
+        default=True,
+        nullable=False,
+        comment="Enable segments and segment matching",
+    )
+    segments_public_creation: Mapped[str] = mapped_column(
+        String(10),
+        default="all",
+        nullable=False,
+        comment="Who may create public segments (all, admins)",
     )
 
     __table_args__ = (CheckConstraint("id = 1", name="single_row_check"),)

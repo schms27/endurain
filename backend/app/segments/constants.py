@@ -55,6 +55,15 @@ MIN_SEGMENT_POINTS: Final[int] = 10
 SEGMENT_SIMPLIFY_TOLERANCE_M: Final[float] = 2.0
 GRADE_WINDOW_M: Final[float] = 100.0
 
+# Duplicate check for a proposed segment: endpoints within this distance
+# and length within this relative difference of an existing segment.
+SIMILAR_ENDPOINT_M: Final[float] = 30.0
+SIMILAR_DISTANCE_RATIO: Final[float] = 0.05
+
+# Leaderboards.
+LEADERBOARD_MAX_RECORDS: Final[int] = 100
+LEADERBOARD_RECENT_DAYS: Final[int] = 90
+
 # Matcher parameters. Bump MATCHER_VERSION whenever a change alters
 # matching results so stored efforts get recomputed.
 MATCHER_VERSION: Final[int] = 1

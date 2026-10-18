@@ -24,6 +24,7 @@ import segments.segment.crud as segment_crud
 import segments.segment.models as segment_models
 import segments.segment_efforts.crud as segment_efforts_crud
 import segments.segment_efforts.models as segment_efforts_models
+import server_settings.crud as server_settings_crud
 
 _METRIC_STREAM_TYPES: dict[int, str] = {
     activity_streams_constants.STREAM_TYPE_HR: "hr",
@@ -357,6 +358,10 @@ def process_segment_match_queue() -> None:
             return
         with core_database.SessionLocal() as db:
             try:
+                settings = server_settings_crud.get_server_settings(db)
+                if settings is not None and not settings.segments_enabled:
+                    # Paused: queued items wait until segments are enabled again.
+                    return
                 _enqueue_outdated_segments(db)
                 completed = drain_queue(db)
                 if completed:

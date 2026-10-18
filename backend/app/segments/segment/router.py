@@ -109,6 +109,43 @@ async def list_segments(
 
 
 @router.get(
+    "/similar",
+    response_model=list[segment_schema.SegmentSummary],
+)
+async def read_similar_segments(
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["segments:read"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+    activity_id: Annotated[int, Query(gt=0)],
+    start_index: Annotated[int, Query(ge=0)],
+    end_index: Annotated[int, Query(gt=0)],
+) -> list[segment_schema.SegmentSummary]:
+    """
+    Existing segments that duplicate a proposed slice of your activity.
+
+    Args:
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+        activity_id: Source activity ID.
+        start_index: First lat/lon stream index of the slice.
+        end_index: Last lat/lon stream index of the slice (inclusive).
+
+    Returns:
+        Similar segments visible to you, closest length first.
+
+    Raises:
+        HTTPException: 400 when the slice is empty or reversed.
+    """
+    if end_index <= start_index:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="end_index must be greater than start_index",
+        )
+    return segment_crud.get_similar_segments(token_user_id, activity_id, start_index, end_index, db)
+
+
+@router.get(
     "/{segment_id}",
     response_model=segment_schema.SegmentRead,
 )
@@ -220,6 +257,52 @@ async def read_my_segment_efforts(
     if segment_crud.get_segment_visible_to_user(segment_id, token_user_id, db) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found")
     return segment_efforts_crud.get_user_segment_efforts(segment_id, token_user_id, db)
+
+
+@router.get(
+    "/{segment_id}/leaderboard",
+    response_model=segment_efforts_schema.SegmentLeaderboard,
+)
+async def read_segment_leaderboard(
+    segment_id: int,
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["segments:read"])],
+    token_user_id: Annotated[int, Depends(auth_dependencies.get_sub_from_access_token)],
+    db: Annotated[Session, Depends(core_database.get_db)],
+    scope: Annotated[segment_efforts_crud.LeaderboardScope, Query()] = segment_efforts_crud.LeaderboardScope.EVERYONE,
+    period: Annotated[segment_efforts_crud.LeaderboardPeriod, Query()] = segment_efforts_crud.LeaderboardPeriod.ALL,
+    page_number: Annotated[int, Query(ge=1)] = 1,
+    num_records: Annotated[int, Query(ge=1, le=segments_constants.LEADERBOARD_MAX_RECORDS)] = 25,
+) -> segment_efforts_schema.SegmentLeaderboard:
+    """
+    Athletes ranked by their best effort on a segment.
+
+    Args:
+        segment_id: Segment ID.
+        _check_scopes: Scope authorization dependency.
+        token_user_id: Authenticated user ID.
+        db: Database session.
+        scope: Rank everyone, the people you follow, or only you.
+        period: All time, this year, or the last 90 days.
+        page_number: 1-based page number.
+        num_records: Page size.
+
+    Returns:
+        The leaderboard page with your own entry.
+
+    Raises:
+        HTTPException: 404 if the segment is missing or not visible.
+    """
+    if segment_crud.get_segment_visible_to_user(segment_id, token_user_id, db) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found")
+    return segment_efforts_crud.get_segment_leaderboard(
+        segment_id,
+        token_user_id,
+        db,
+        scope=scope,
+        period=period,
+        page_number=page_number,
+        num_records=num_records,
+    )
 
 
 @router.post(

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 import { ArrowLeft } from '@lucide/vue'
 
+import type { MapOverlay } from '@/composables/useMapProvider'
 import type { ActivityOwner, HrZoneBucket } from '@/features/activities/types'
 import type { StreamChart } from '@/features/activities/utils/streams'
 
@@ -22,6 +23,7 @@ import ActivityMetricsGrid from '@/features/activities/components/ActivityMetric
 import ActivityPrivacyAlerts from '@/features/activities/components/ActivityPrivacyAlerts.vue'
 import ActivityStreamChart from '@/features/activities/components/ActivityStreamChart.vue'
 import ActivityWorkoutSets from '@/features/activities/components/ActivityWorkoutSets.vue'
+import ActivitySegmentEfforts from '@/features/segments/components/ActivitySegmentEfforts.vue'
 import {
   useActivityExerciseTitlesQuery,
   useActivityLapsQuery,
@@ -40,6 +42,7 @@ import {
 } from '@/features/activities/utils/privacy'
 import { extractHrZones } from '@/features/activities/utils/hrZones'
 import { buildStreamCharts, extractTrackPoints } from '@/features/activities/utils/streams'
+import { extractIndexedTrack } from '@/features/segments/utils/segments'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -94,6 +97,11 @@ const showMap = computed(
     canViewField(activity.value, 'hideMap', currentUserId.value) &&
     trackPoints.value.length > 0,
 )
+
+// Segment efforts index into the raw GPS stream, so they get their own track
+// that keeps each point's stream index. Hovering an effort highlights it.
+const segmentTrack = computed(() => (showMap.value ? extractIndexedTrack(streams.value ?? []) : []))
+const segmentOverlays = ref<MapOverlay[]>([])
 
 const streamCharts = computed(() => {
   if (!activity.value) {
@@ -294,6 +302,15 @@ const notFound = computed(() => !isPending.value && !isError.value && activity.v
         :points="showMap ? trackPoints : []"
         :activity-id="activity.id"
         :is-owner="isOwner"
+        :overlays="segmentOverlays"
+      />
+
+      <ActivitySegmentEfforts
+        :activity="activity"
+        :track="segmentTrack"
+        :units="units"
+        :is-owner="isOwner"
+        @highlight="segmentOverlays = $event"
       />
 
       <ActivityGearCard v-if="isOwner" :activity="activity" />

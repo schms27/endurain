@@ -55,6 +55,7 @@ def _make_user_mock() -> MagicMock:
     user.hide_activity_laps = False
     user.hide_activity_workout_sets_steps = False
     user.hide_activity_gear = False
+    user.hide_from_segment_leaderboards = False
     # Mirror the ORM: no has_local_password attribute, so
     # UsersMe.model_validate falls back to the default (None)
     # before the router overrides it via IdentityService.
@@ -84,6 +85,7 @@ def _make_privacy_mock() -> MagicMock:
     p.hide_activity_laps = False
     p.hide_activity_workout_sets_steps = False
     p.hide_activity_gear = False
+    p.hide_from_segment_leaderboards = False
     return p
 
 

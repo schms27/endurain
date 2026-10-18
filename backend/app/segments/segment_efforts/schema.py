@@ -33,6 +33,8 @@ class SegmentEffortRead(BaseModel):
         historical_rank: Rank among the owner's efforts up to this
             effort's date (the achievement at the time); None for
             excluded efforts.
+        pr_elapsed_time: The owner's current PR on this segment in
+            seconds (owner only).
     """
 
     id: StrictInt
@@ -54,6 +56,7 @@ class SegmentEffortRead(BaseModel):
     is_excluded: bool
     current_rank: StrictInt | None = None
     historical_rank: StrictInt | None = None
+    pr_elapsed_time: float | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -77,3 +80,60 @@ class SegmentEffortEdit(BaseModel):
     is_excluded: bool
 
     model_config = ConfigDict(extra="forbid")
+
+
+class SegmentLeaderboardEntry(BaseModel):
+    """
+    One athlete's best visible effort on a segment.
+
+    Attributes:
+        rank: Leaderboard rank (ties share a rank).
+        user_id: Athlete user ID.
+        user_name: Athlete display name.
+        username: Athlete username.
+        user_photo_path: Athlete photo path.
+        effort_id: Effort ID.
+        activity_id: Activity ID.
+        start_time: Effort start time; None when the owner hides start
+            times.
+        elapsed_time: Elapsed seconds.
+        average_hr: Average heart rate (bpm), unless hidden.
+        average_power: Average power (W), unless hidden.
+        average_speed: Average speed (m/s), unless hidden.
+    """
+
+    rank: StrictInt
+    user_id: StrictInt
+    user_name: str | None
+    username: str | None
+    user_photo_path: str | None
+    effort_id: StrictInt
+    activity_id: StrictInt
+    start_time: datetime | None
+    elapsed_time: float
+    average_hr: StrictInt | None
+    average_power: StrictInt | None
+    average_speed: float | None
+
+    @field_validator("elapsed_time", mode="before")
+    @classmethod
+    def _coerce_decimal(cls, value: object) -> object:
+        """Convert ORM ``Decimal`` values to ``float``."""
+        if isinstance(value, Decimal):
+            return float(value)
+        return value
+
+
+class SegmentLeaderboard(BaseModel):
+    """
+    A page of a segment leaderboard.
+
+    Attributes:
+        entries: Ranked entries for the requested page.
+        total: Number of ranked athletes.
+        viewer_entry: The viewer's own entry, if they have one.
+    """
+
+    entries: list[SegmentLeaderboardEntry]
+    total: StrictInt
+    viewer_entry: SegmentLeaderboardEntry | None

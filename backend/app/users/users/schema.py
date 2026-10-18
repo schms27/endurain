@@ -354,6 +354,8 @@ class UsersMe(UsersRead):
         hide_activity_workout_sets_steps: Hide workout
             sets/steps.
         hide_activity_gear: Hide gear setting.
+        hide_from_segment_leaderboards: Hide from other users'
+            segment leaderboards.
         has_local_password: Whether the account has a local
             password (False for SSO-only accounts).
     """
@@ -375,6 +377,9 @@ class UsersMe(UsersRead):
         default=None, description="Hide activity workout sets and steps"
     )
     hide_activity_gear: StrictBool | None = Field(default=None, description="Hide activity gear")
+    hide_from_segment_leaderboards: StrictBool | None = Field(
+        default=None, description="Hide from other users' segment leaderboards"
+    )
     has_local_password: StrictBool | None = Field(
         default=None,
         description=(

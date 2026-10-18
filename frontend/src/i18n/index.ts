@@ -18,6 +18,7 @@ import enUserProfile from './locales/en/userProfile.json'
 import enSummary from './locales/en/summary.json'
 import enHealth from './locales/en/health.json'
 import enRoutes from './locales/en/routes.json'
+import enSegments from './locales/en/segments.json'
 
 /**
  * English message set, assembled from one file per feature namespace. The
@@ -42,6 +43,7 @@ const en = {
   summary: enSummary,
   health: enHealth,
   routes: enRoutes,
+  segments: enSegments,
 }
 
 /**

@@ -149,6 +149,8 @@ class TestEditServerSettings:
         mock_updated_settings.password_length_admin_users = 15
         mock_updated_settings.tileserver_api_key = None
         mock_updated_settings.tileserver_regenerate_thumbnails_on_change = False
+        mock_updated_settings.segments_enabled = True
+        mock_updated_settings.segments_public_creation = "admins"
 
         mock_edit_settings.return_value = mock_updated_settings
 

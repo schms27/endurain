@@ -105,6 +105,12 @@ const router = createRouter({
       meta: { requiresAuth: true, cardless: true },
     },
     {
+      path: '/segment/:id',
+      name: 'segment',
+      component: () => import('@/features/segments/views/SegmentDetailView.vue'),
+      meta: { requiresAuth: true, cardless: true },
+    },
+    {
       path: '/activity/:id',
       name: 'activity',
       component: () => import('@/features/activities/views/ActivityDetailView.vue'),

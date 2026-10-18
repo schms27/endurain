@@ -5,6 +5,7 @@ from sqlalchemy import Select, delete, func, or_, select
 from sqlalchemy.orm import Session
 
 import activities.activity.crud as activity_crud
+import activities.activity.schema as activity_schema
 import activities.activity_streams.constants as activity_streams_constants
 import activities.activity_streams.crud as activity_streams_crud
 import core.decorators as core_decorators
@@ -16,6 +17,9 @@ import segments.segment.models as segment_models
 import segments.segment.schema as segment_schema
 import segments.segment.utils as segment_utils
 import segments.segment_efforts.models as segment_efforts_models
+import server_settings.crud as server_settings_crud
+import users.users.models as users_models
+import users.users.schema as users_schema
 
 
 def _visible_to(user_id: int):
@@ -190,6 +194,145 @@ def get_outdated_segment_ids(db: Session) -> list[int]:
     return list(db.scalars(stmt).all())
 
 
+def _check_creation_allowed(user_id: int, visibility: int, db: Session) -> None:
+    """
+    Enforce the server settings for creating or publishing a segment.
+
+    Args:
+        user_id: Requesting user ID.
+        visibility: Requested segment visibility.
+        db: Database session.
+
+    Returns:
+        None.
+
+    Raises:
+        HTTPException: 403 when segments are disabled, or when only
+            admins may create public segments and the user is not one.
+    """
+    settings = server_settings_crud.get_server_settings(db)
+    if settings is None:
+        return
+    if not settings.segments_enabled:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Segments are disabled on this server")
+    if visibility != segments_constants.SEGMENT_VISIBILITY_PUBLIC or settings.segments_public_creation != "admins":
+        return
+    access_type = db.scalar(select(users_models.Users.access_type).where(users_models.Users.id == user_id))
+    if access_type != users_schema.UserAccessType.ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only administrators may create public segments",
+        )
+
+
+def _slice_geometry(
+    user_id: int,
+    activity_id: int,
+    start_index: int,
+    end_index: int,
+    db: Session,
+) -> tuple[activity_schema.Activity, segments_constants.SportGroup, segment_utils.SegmentGeometry]:
+    """
+    Build segment geometry from a slice of one of the user's activities.
+
+    Args:
+        user_id: Requesting user ID (must own the activity).
+        activity_id: Source activity ID.
+        start_index: First lat/lon stream index of the slice.
+        end_index: Last lat/lon stream index of the slice (inclusive).
+        db: Database session.
+
+    Returns:
+        Tuple of (activity, sport group, segment geometry).
+
+    Raises:
+        HTTPException: 404 if the activity is missing or not owned,
+            400 if its sport or GPS slice cannot become a segment.
+    """
+    activity = activity_crud.get_activity_by_id(activity_id, db)
+    if activity is None or activity.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Activity not found")
+
+    sport_group = segments_constants.ACTIVITY_TYPE_SPORT_GROUP.get(activity.activity_type)
+    if sport_group is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Segments are not supported for this activity type",
+        )
+
+    map_stream = activity_streams_crud.get_activity_stream_by_type(
+        activity_id, activity_streams_constants.STREAM_TYPE_MAP, user_id, db
+    )
+    if map_stream is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Activity has no GPS data")
+    elevation_stream = activity_streams_crud.get_activity_stream_by_type(
+        activity_id, activity_streams_constants.STREAM_TYPE_ELEVATION, user_id, db
+    )
+
+    try:
+        geometry = segment_utils.build_segment_geometry(
+            map_stream.stream_waypoints,
+            elevation_stream.stream_waypoints if elevation_stream else None,
+            start_index,
+            end_index,
+            sport_group,
+        )
+    except segment_utils.SegmentGeometryError as err:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
+    return activity, sport_group, geometry
+
+
+@core_decorators.handle_db_errors
+def get_similar_segments(
+    user_id: int,
+    activity_id: int,
+    start_index: int,
+    end_index: int,
+    db: Session,
+) -> list[segment_schema.SegmentSummary]:
+    """
+    Visible segments that duplicate a proposed activity slice.
+
+    A segment is similar when it has the same sport group and direction,
+    its start and end lie within ``SIMILAR_ENDPOINT_M`` of the slice's,
+    and its length differs by at most ``SIMILAR_DISTANCE_RATIO``.
+
+    Args:
+        user_id: Requesting user ID (must own the activity).
+        activity_id: Source activity ID.
+        start_index: First lat/lon stream index of the slice.
+        end_index: Last lat/lon stream index of the slice (inclusive).
+        db: Database session.
+
+    Returns:
+        Similar segments, closest length first.
+    """
+    _, sport_group, geometry = _slice_geometry(user_id, activity_id, start_index, end_index, db)
+    (start_lat, start_lon), (end_lat, end_lon) = geometry.start, geometry.end
+    near_start = core_geo.BoundingBox(start_lat, start_lon, start_lat, start_lon).padded(
+        segments_constants.SIMILAR_ENDPOINT_M
+    )
+    stmt = select(segment_models.Segment).where(
+        _visible_to(user_id),
+        segment_models.Segment.sport_group == sport_group.value,
+        segment_models.Segment.start_lat.between(near_start.min_lat, near_start.max_lat),
+        segment_models.Segment.start_lon.between(near_start.min_lon, near_start.max_lon),
+    )
+    similar = []
+    for candidate in db.scalars(stmt).all():
+        start_gap = float(core_geo.haversine_m(start_lat, start_lon, candidate.start_lat, candidate.start_lon))
+        end_gap = float(core_geo.haversine_m(end_lat, end_lon, candidate.end_lat, candidate.end_lon))
+        length_ratio = abs(float(candidate.distance) - geometry.distance) / geometry.distance
+        if (
+            start_gap <= segments_constants.SIMILAR_ENDPOINT_M
+            and end_gap <= segments_constants.SIMILAR_ENDPOINT_M
+            and length_ratio <= segments_constants.SIMILAR_DISTANCE_RATIO
+        ):
+            similar.append((length_ratio, candidate))
+    similar.sort(key=lambda pair: (pair[0], pair[1].id))
+    return [segment_schema.SegmentSummary.model_validate(candidate) for _, candidate in similar]
+
+
 def create_segment(
     user_id: int,
     segment: segment_schema.SegmentCreate,
@@ -209,39 +352,14 @@ def create_segment(
         The created segment.
 
     Raises:
-        HTTPException: 404 if the activity is missing or not owned,
-            400 if its sport or GPS slice cannot become a segment.
+        HTTPException: 403 if the server settings forbid it, 404 if the
+            activity is missing or not owned, 400 if its sport or GPS
+            slice cannot become a segment.
     """
-    activity = activity_crud.get_activity_by_id(segment.activity_id, db)
-    if activity is None or activity.user_id != user_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Activity not found")
-
-    sport_group = segments_constants.ACTIVITY_TYPE_SPORT_GROUP.get(activity.activity_type)
-    if sport_group is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Segments are not supported for this activity type",
-        )
-
-    map_stream = activity_streams_crud.get_activity_stream_by_type(
-        segment.activity_id, activity_streams_constants.STREAM_TYPE_MAP, user_id, db
+    _check_creation_allowed(user_id, segment.visibility, db)
+    activity, sport_group, geometry = _slice_geometry(
+        user_id, segment.activity_id, segment.start_index, segment.end_index, db
     )
-    if map_stream is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Activity has no GPS data")
-    elevation_stream = activity_streams_crud.get_activity_stream_by_type(
-        segment.activity_id, activity_streams_constants.STREAM_TYPE_ELEVATION, user_id, db
-    )
-
-    try:
-        geometry = segment_utils.build_segment_geometry(
-            map_stream.stream_waypoints,
-            elevation_stream.stream_waypoints if elevation_stream else None,
-            segment.start_index,
-            segment.end_index,
-            sport_group,
-        )
-    except segment_utils.SegmentGeometryError as err:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
 
     (start_lat, start_lon), (end_lat, end_lon) = geometry.start, geometry.end
     db_segment = segment_models.Segment(
@@ -333,7 +451,8 @@ def edit_segment(
         The updated segment.
 
     Raises:
-        HTTPException: 404 if missing or not owned.
+        HTTPException: 404 if missing or not owned, 403 if publishing
+            is not allowed.
     """
     segment = _get_owned_segment(segment_id, user_id, db)
     changes = edit.model_dump(exclude_unset=True)
@@ -343,6 +462,7 @@ def edit_segment(
         description = changes["description"]
         segment.description = core_sanitization.sanitize_markdown(description) if description else None
     if changes.get("visibility") is not None and changes["visibility"] != segment.visibility:
+        _check_creation_allowed(user_id, changes["visibility"], db)
         segment.visibility = changes["visibility"]
         segments_queue.enqueue_segment(segment.id, db, commit=False)
     try:

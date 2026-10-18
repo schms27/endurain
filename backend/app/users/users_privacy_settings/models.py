@@ -33,6 +33,8 @@ class UsersPrivacySettings(Base):
         hide_activity_workout_sets_steps: Hide activity workout
             sets and steps.
         hide_activity_gear: Hide activity gear.
+        hide_from_segment_leaderboards: Hide your efforts from other
+            users' segment leaderboards.
         user: Relationship to Users model.
     """
 
@@ -114,6 +116,11 @@ class UsersPrivacySettings(Base):
         default=False,
         nullable=False,
         comment="Hide activity gear",
+    )
+    hide_from_segment_leaderboards: Mapped[bool] = mapped_column(
+        default=False,
+        nullable=False,
+        comment="Hide your efforts from other users' segment leaderboards",
     )
 
     # Define a relationship to the Users model

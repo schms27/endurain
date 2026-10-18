@@ -1,0 +1,128 @@
+{
+  "sportGroup": {
+    "run": "Run",
+    "ride": "Ride",
+    "e_ride": "E-bike ride",
+    "foot": "Walk and hike"
+  },
+  "visibility": {
+    "label": "Visibility",
+    "public": "Public",
+    "private": "Private",
+    "hint": "Public segments are matched against everyone's activities and have a leaderboard. Private segments only match your own.",
+    "adminsOnly": "Only administrators may create public segments on this server."
+  },
+  "medal": {
+    "gold": "PR",
+    "silver": "2nd",
+    "bronze": "3rd"
+  },
+  "stats": {
+    "distance": "Distance",
+    "averageGrade": "Average grade",
+    "maximumGrade": "Maximum grade",
+    "elevationGain": "Elevation gain",
+    "efforts": "Efforts",
+    "athletes": "Athletes"
+  },
+  "efforts": {
+    "title": "Segments",
+    "create": "Create segment",
+    "empty": "No segments matched this activity yet. Create one from a stretch you ride or run often.",
+    "unnamed": "Segment",
+    "currentRank": "#{rank} of your efforts",
+    "vsPr": "{delta} vs PR",
+    "exclude": "Exclude this effort",
+    "restore": "Include this effort again",
+    "excluded": "Effort excluded",
+    "restored": "Effort included again",
+    "excludeError": "Couldn't update the effort.",
+    "excludedLabel": "Excluded"
+  },
+  "create": {
+    "title": "Create segment",
+    "description": "Pick the stretch of this activity that becomes the segment. Your other activities are matched against it in the background.",
+    "start": "Start",
+    "end": "End",
+    "range": "From {from} to {to} · {length}",
+    "name": "Name",
+    "descriptionLabel": "Description",
+    "similar": "Similar segments already exist:",
+    "save": "Create segment",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Segment created. Matching your activities in the background.",
+    "error": "Couldn't create the segment.",
+    "problem": {
+      "tooFewPoints": "Pick a longer stretch: a segment needs at least 10 GPS points.",
+      "tooShort": "Pick a longer stretch: this one is shorter than the minimum segment length.",
+      "tooLong": "Pick a shorter stretch: segments can be at most 100 km long."
+    }
+  },
+  "edit": {
+    "title": "Edit segment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Segment updated",
+    "error": "Couldn't update the segment.",
+    "visibilityRematch": "Changing the visibility rematches the segment in the background."
+  },
+  "delete": {
+    "title": "Delete segment?",
+    "body": "\"{name}\" and all its efforts will be deleted. This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Segment deleted",
+    "error": "Couldn't delete the segment."
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "rematch": "Rematch",
+    "rematchQueued": "Rematching in the background",
+    "rematchError": "Couldn't start the rematch."
+  },
+  "detail": {
+    "back": "Back",
+    "notFoundTitle": "Segment not found",
+    "notFoundDescription": "This segment doesn't exist or isn't visible to you.",
+    "elevation": "Elevation",
+    "sourceActivity": "Source activity",
+    "leaderboardTab": "Leaderboard",
+    "myEffortsTab": "My efforts"
+  },
+  "leaderboard": {
+    "scope": "Athletes",
+    "scopeEveryone": "Everyone",
+    "scopeFollowing": "People I follow",
+    "scopeMe": "Only me",
+    "period": "Period",
+    "periodAll": "All time",
+    "periodThisYear": "This year",
+    "periodLast90Days": "Last 90 days",
+    "rank": "Rank",
+    "athlete": "Athlete",
+    "date": "Date",
+    "time": "Time",
+    "speed": "Pace / speed",
+    "empty": "No efforts on this segment yet.",
+    "total": "{count} athlete | {count} athletes",
+    "unknownAthlete": "Athlete",
+    "viewActivity": "View activity",
+    "errorTitle": "Couldn't load the leaderboard",
+    "errorDescription": "Something went wrong while loading the leaderboard."
+  },
+  "myEfforts": {
+    "empty": "You have no efforts on this segment yet.",
+    "pr": "Your PR: {time}",
+    "chartTitle": "Your progression",
+    "chartLabel": "Elapsed time"
+  },
+  "error": {
+    "title": "Couldn't load the segment",
+    "description": "Something went wrong while loading this segment.",
+    "retry": "Try again"
+  }
+}

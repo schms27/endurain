@@ -339,6 +339,14 @@
       "backgroundColor": "Map background color",
       "regenerateThumbnails": "Regenerate activity thumbnails when map settings change"
     },
+    "segments": {
+      "title": "Segments",
+      "enabled": "Enable segments and segment matching",
+      "publicCreation": "Who may create public segments",
+      "publicCreationHint": "Private segments can always be created by everyone.",
+      "publicCreationAll": "All users",
+      "publicCreationAdmins": "Administrators only"
+    },
     "photo": {
       "title": "Login photo",
       "description": "A custom image shown on the login screen",
@@ -875,6 +883,9 @@
       "hideLaps": "Laps",
       "hideWorkoutSetsSteps": "Workout sets and steps",
       "hideGear": "Gear",
+      "segmentsTitle": "Segments",
+      "hideFromSegmentLeaderboards": "Hide me from segment leaderboards",
+      "hideFromSegmentLeaderboardsHint": "Other users will not see your efforts on segment leaderboards. You still see your own records.",
       "save": "Save privacy",
       "saving": "Saving…",
       "saveSuccess": "Privacy settings updated",

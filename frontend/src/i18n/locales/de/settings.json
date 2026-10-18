@@ -339,6 +339,14 @@
       "backgroundColor": "Karten-Hintergrundfarbe",
       "regenerateThumbnails": "Aktivitäts-Vorschaubilder bei Karteneinstellungsänderungen neu generieren"
     },
+    "segments": {
+      "title": "Segmente",
+      "enabled": "Segmente und Segmentabgleich aktivieren",
+      "publicCreation": "Wer darf öffentliche Segmente erstellen",
+      "publicCreationHint": "Private Segmente können immer alle erstellen.",
+      "publicCreationAll": "Alle Benutzer",
+      "publicCreationAdmins": "Nur Administratoren"
+    },
     "photo": {
       "title": "Anmeldefoto",
       "description": "Ein benutzerdefiniertes Bild auf dem Anmeldebildschirm",
@@ -851,6 +859,9 @@
       "hideLaps": "Runden",
       "hideWorkoutSetsSteps": "Trainingssätze und -schritte",
       "hideGear": "Ausrüstung",
+      "segmentsTitle": "Segmente",
+      "hideFromSegmentLeaderboards": "Mich in Segment-Bestenlisten ausblenden",
+      "hideFromSegmentLeaderboardsHint": "Andere sehen deine Leistungen nicht in Segment-Bestenlisten. Deine eigenen Bestzeiten siehst du weiterhin.",
       "save": "Datenschutz speichern",
       "saving": "Wird gespeichert…",
       "saveSuccess": "Datenschutzeinstellungen aktualisiert",

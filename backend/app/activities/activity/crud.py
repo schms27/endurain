@@ -98,6 +98,22 @@ def _visible_to_requester_condition(requester_user_id: int | None):
     )
 
 
+def visible_to_requester_condition(requester_user_id: int | None):
+    """Condition for activities a non-owner may see.
+
+    Used by other packages (segment leaderboards) that need to filter
+    activities exactly like the activity endpoints do.
+
+    Args:
+        requester_user_id: Requesting user ID, or None for an
+            anonymous/public-only read.
+
+    Returns:
+        SQLAlchemy condition on ``activities``.
+    """
+    return _visible_to_requester_condition(requester_user_id)
+
+
 def _apply_activity_visibility_filter(
     stmt,
     *,

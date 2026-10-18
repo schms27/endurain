@@ -235,6 +235,7 @@ def test_process_queue_logs_unexpected_errors():
     with (
         patch("segments.matching.jobs._queue_lock", _acquired),
         patch("segments.matching.jobs.core_database.SessionLocal", _session),
+        patch("segments.matching.jobs.server_settings_crud.get_server_settings", return_value=None),
         patch("segments.matching.jobs._enqueue_outdated_segments", side_effect=RuntimeError("db down")),
         patch("segments.matching.jobs.core_logger.print_to_log") as log,
     ):
