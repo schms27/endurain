@@ -1,9 +1,7 @@
 """5: add route sharing (visibility, share token, endpoint trimming, copies)
 
-Also merges the two v0.20.0 revision 3 heads (routes and auto import).
-
 Revision ID: 5c8d1a3f9b20
-Revises: cb0c2a45883f, 02bfadfaa1bb
+Revises: 7f3e2b9c1d4a
 Create Date: 2026-10-18 23:00:00.000000
 
 """
@@ -15,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "5c8d1a3f9b20"
-down_revision: str | Sequence[str] | None = ("cb0c2a45883f", "02bfadfaa1bb")
+down_revision: str | None = "7f3e2b9c1d4a"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
