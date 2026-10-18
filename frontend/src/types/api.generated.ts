@@ -4428,6 +4428,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/routes/by_token/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Shared Route
+         * @description Get a route shared through an unlisted link.
+         *
+         *     Args:
+         *         token: Share token from the link.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The route as a non-owner sees it.
+         */
+        get: operations["read_shared_route_api_v1_public_routes_by_token__token__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/routes/by_token/{token}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Shared Route
+         * @description Download a route shared through an unlisted link as GPX.
+         *
+         *     Args:
+         *         token: Share token from the link.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The GPX file as an attachment.
+         */
+        get: operations["export_shared_route_api_v1_public_routes_by_token__token__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/routes/{route_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Public Route
+         * @description Get a public route.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The route as a non-owner sees it.
+         */
+        get: operations["read_public_route_api_v1_public_routes__route_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/routes/{route_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Public Route
+         * @description Download a public route as GPX.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The GPX file as an attachment.
+         */
+        get: operations["export_public_route_api_v1_public_routes__route_id__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/server_settings": {
         parameters: {
             query?: never;
@@ -4607,6 +4715,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/routes/shared/{token}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Shared Route
+         * @description Save a route shared with you by link to your routes, as a private copy.
+         *
+         *     Args:
+         *         token: Share token from the link.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The new route.
+         */
+        post: operations["copy_shared_route_api_v1_routes_shared__token__copy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/routes/{route_id}": {
         parameters: {
             query?: never;
@@ -4616,7 +4753,7 @@ export interface paths {
         };
         /**
          * Read Route
-         * @description Get one of your routes.
+         * @description Get a route you own or can see (trimmed for non-owners).
          *
          *     Args:
          *         route_id: Route ID.
@@ -4663,6 +4800,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/routes/{route_id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Route
+         * @description Save a route you can see to your routes, as a private copy.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The new route.
+         */
+        post: operations["copy_route_api_v1_routes__route_id__copy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/routes/{route_id}/export": {
         parameters: {
             query?: never;
@@ -4672,7 +4838,7 @@ export interface paths {
         };
         /**
          * Export Route
-         * @description Download one of your routes as a file for a device or another app.
+         * @description Download a route you can see as a file for a device or another app.
          *
          *     Args:
          *         route_id: Route ID.
@@ -4682,12 +4848,84 @@ export interface paths {
          *         export_format: Output format (GPX only for now).
          *
          *     Returns:
-         *         The file as an attachment.
+         *         The file as an attachment, trimmed for non-owners.
          */
         get: operations["export_route_api_v1_routes__route_id__export_get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/{route_id}/home_warning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Home Warning
+         * @description Check whether one of your routes starts or ends near where many of your
+         *     activities start, which may reveal where you live.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         Which visible endpoints are flagged.
+         */
+        get: operations["read_home_warning_api_v1_routes__route_id__home_warning_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/{route_id}/share_token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Share Token
+         * @description Create or rotate the unlisted share link of one of your routes.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The route with its new share token.
+         */
+        post: operations["create_share_token_api_v1_routes__route_id__share_token_post"];
+        /**
+         * Revoke Share Token
+         * @description Revoke the unlisted share link of one of your routes.
+         *
+         *     Args:
+         *         route_id: Route ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The route without a share token.
+         */
+        delete: operations["revoke_share_token_api_v1_routes__route_id__share_token_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -5780,6 +6018,37 @@ export interface paths {
          *         None
          */
         delete: operations["delete_user_photo_api_v1_users__user_id__photo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List User Routes
+         * @description List a user's routes that you can see, newest first.
+         *
+         *     Args:
+         *         user_id: Profile user ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         page_number: 1-based page number.
+         *         num_records: Page size.
+         *
+         *     Returns:
+         *         One page of routes and the total count.
+         */
+        get: operations["list_user_routes_api_v1_users__user_id__routes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -10139,6 +10408,74 @@ export interface components {
             username?: string | null;
         };
         /**
+         * PublicRouteRead
+         * @description A route as shown on its public page.
+         *
+         *     Attributes:
+         *         owner: The creator, only when the server shares user info on
+         *             public links.
+         */
+        PublicRouteRead: {
+            /** Activity Type */
+            activity_type: number | null;
+            /** City */
+            city: string | null;
+            /** Country */
+            country: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string | null;
+            /** Distance */
+            distance: number;
+            /** Elevation Gain */
+            elevation_gain: number | null;
+            /** Elevation Loss */
+            elevation_loss: number | null;
+            /** Elevation Max */
+            elevation_max: number | null;
+            /** Elevation Min */
+            elevation_min: number | null;
+            /** Geometry */
+            geometry: (number | null)[][];
+            /** Hide Endpoints M */
+            hide_endpoints_m: number;
+            /** Id */
+            id: number;
+            /** Is Loop */
+            is_loop: boolean;
+            /**
+             * Is Owner
+             * @default false
+             */
+            is_owner: boolean;
+            /** Name */
+            name: string;
+            /** Original Filename */
+            original_filename: string | null;
+            owner?: components["schemas"]["RouteOwner"] | null;
+            /** Share Token */
+            share_token: string | null;
+            source: components["schemas"]["RouteSource"];
+            /** Source Activity Id */
+            source_activity_id: number | null;
+            /** Source Route Id */
+            source_route_id: number | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** User Id */
+            user_id: number;
+            visibility: components["schemas"]["RouteVisibility"];
+            /** Waypoints */
+            waypoints: components["schemas"]["RoutePoi"][];
+        };
+        /**
          * RouteEdit
          * @description Editable route attributes.
          *
@@ -10146,14 +10483,19 @@ export interface components {
          *         name: New name.
          *         description: New description (null clears it).
          *         activity_type: New intended sport (null clears it).
+         *         visibility: Who can see the route.
+         *         hide_endpoints_m: Metres hidden at both ends for non-owners.
          */
         RouteEdit: {
             /** Activity Type */
             activity_type?: number | null;
             /** Description */
             description?: string | null;
+            /** Hide Endpoints M */
+            hide_endpoints_m?: number | null;
             /** Name */
             name?: string | null;
+            visibility?: components["schemas"]["RouteVisibility"] | null;
         };
         /**
          * RouteFromActivity
@@ -10171,6 +10513,40 @@ export interface components {
             name?: string | null;
             /** Start Index */
             start_index?: number | null;
+        };
+        /**
+         * RouteHomeWarning
+         * @description Whether a route's visible endpoints may reveal where the owner lives.
+         *
+         *     An endpoint is flagged when several of the owner's activities start
+         *     close to it.
+         *
+         *     Attributes:
+         *         start_near_home: The visible start is near a frequent activity start.
+         *         end_near_home: The visible end is near a frequent activity start.
+         */
+        RouteHomeWarning: {
+            /** End Near Home */
+            end_near_home: boolean;
+            /** Start Near Home */
+            start_near_home: boolean;
+        };
+        /**
+         * RouteOwner
+         * @description Public details of a route's creator.
+         *
+         *     Attributes:
+         *         id: User ID.
+         *         name: Display name.
+         *         username: Username.
+         */
+        RouteOwner: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Username */
+            username: string;
         };
         /**
          * RoutePoi
@@ -10201,10 +10577,17 @@ export interface components {
          * RouteRead
          * @description Full route details.
          *
+         *     Non-owners get the trimmed geometry and no owner-only fields (share
+         *     token, source activity, file name).
+         *
          *     Attributes:
          *         description: Description.
-         *         source_activity_id: Activity the route was saved from.
-         *         original_filename: Name of the imported file.
+         *         source_activity_id: Activity the route was saved from (owner only).
+         *         source_route_id: Route this one was copied from.
+         *         original_filename: Name of the imported file (owner only).
+         *         share_token: Unlisted link token (owner only).
+         *         hide_endpoints_m: Metres hidden at both ends for non-owners.
+         *         is_owner: Whether the requester owns the route.
          *         geometry: Simplified ``[[lat, lon, ele | None], ...]`` polyline.
          *         waypoints: Points of interest.
          *         elevation_min: Lowest elevation in metres.
@@ -10237,17 +10620,28 @@ export interface components {
             elevation_min: number | null;
             /** Geometry */
             geometry: (number | null)[][];
+            /** Hide Endpoints M */
+            hide_endpoints_m: number;
             /** Id */
             id: number;
             /** Is Loop */
             is_loop: boolean;
+            /**
+             * Is Owner
+             * @default false
+             */
+            is_owner: boolean;
             /** Name */
             name: string;
             /** Original Filename */
             original_filename: string | null;
+            /** Share Token */
+            share_token: string | null;
             source: components["schemas"]["RouteSource"];
             /** Source Activity Id */
             source_activity_id: number | null;
+            /** Source Route Id */
+            source_route_id: number | null;
             /**
              * Updated At
              * Format: date-time
@@ -10255,6 +10649,7 @@ export interface components {
             updated_at: string;
             /** User Id */
             user_id: number;
+            visibility: components["schemas"]["RouteVisibility"];
             /** Waypoints */
             waypoints: components["schemas"]["RoutePoi"][];
         };
@@ -10265,9 +10660,10 @@ export interface components {
          *     Members:
          *         IMPORT: Imported from a GPX, TCX or FIT file.
          *         ACTIVITY: Saved from a recorded activity.
+         *         COPY: Copied from another user's shared route.
          * @enum {integer}
          */
-        RouteSource: 1 | 2;
+        RouteSource: 1 | 2 | 4;
         /**
          * RouteSummary
          * @description Route fields for lists (no geometry).
@@ -10278,7 +10674,8 @@ export interface components {
          *         name: Route name.
          *         activity_type: Intended sport.
          *         source: How the route was created.
-         *         distance: Length in metres.
+         *         visibility: Who can see the route.
+         *         distance: Length in metres (after endpoint trimming for non-owners).
          *         elevation_gain: Elevation gain in metres.
          *         elevation_loss: Elevation loss in metres.
          *         is_loop: Whether the route is a loop.
@@ -10313,7 +10710,20 @@ export interface components {
             source: components["schemas"]["RouteSource"];
             /** User Id */
             user_id: number;
+            visibility: components["schemas"]["RouteVisibility"];
         };
+        /**
+         * RouteVisibility
+         * @description Who can see a route; same codes as activity visibility.
+         *
+         *     Members:
+         *         PUBLIC: Every signed-in user, and anonymous visitors when public
+         *             shareable links are enabled.
+         *         FOLLOWERS: Accepted followers of the owner.
+         *         PRIVATE: Only the owner.
+         * @enum {integer}
+         */
+        RouteVisibility: 0 | 1 | 2;
         /**
          * RoutesPage
          * @description One page of routes.
@@ -17940,6 +18350,130 @@ export interface operations {
             };
         };
     };
+    read_shared_route_api_v1_public_routes_by_token__token__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicRouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_shared_route_api_v1_public_routes_by_token__token__export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/gpx+xml": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_public_route_api_v1_public_routes__route_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicRouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_public_route_api_v1_public_routes__route_id__export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/gpx+xml": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_public_server_settings_api_v1_public_server_settings_get: {
         parameters: {
             query?: never;
@@ -18113,6 +18647,37 @@ export interface operations {
             };
         };
     };
+    copy_shared_route_api_v1_routes_shared__token__copy_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_route_api_v1_routes__route_id__get: {
         parameters: {
             query?: never;
@@ -18208,6 +18773,37 @@ export interface operations {
             };
         };
     };
+    copy_route_api_v1_routes__route_id__copy_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     export_route_api_v1_routes__route_id__export_get: {
         parameters: {
             query?: {
@@ -18228,6 +18824,99 @@ export interface operations {
                 };
                 content: {
                     "application/gpx+xml": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_home_warning_api_v1_routes__route_id__home_warning_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteHomeWarning"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_share_token_api_v1_routes__route_id__share_token_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_share_token_api_v1_routes__route_id__share_token_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteRead"];
                 };
             };
             /** @description Validation Error */
@@ -19566,6 +20255,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_user_routes_api_v1_users__user_id__routes_get: {
+        parameters: {
+            query?: {
+                page_number?: number;
+                num_records?: number;
+            };
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoutesPage"];
+                };
             };
             /** @description Validation Error */
             422: {

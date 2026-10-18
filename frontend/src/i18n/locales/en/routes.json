@@ -18,7 +18,8 @@
   "item": {
     "loop": "Loop",
     "fromActivity": "From activity",
-    "imported": "Imported"
+    "imported": "Imported",
+    "copied": "Copied"
   },
   "stats": {
     "distance": "Distance",
@@ -31,20 +32,27 @@
   "detail": {
     "back": "Back to routes",
     "notFoundTitle": "Route not found",
-    "notFoundDescription": "This route doesn't exist or isn't yours.",
+    "notFoundDescription": "This route doesn't exist or you can't see it.",
     "elevation": "Elevation",
     "noElevation": "This route has no elevation data.",
     "pointsOfInterest": "Points of interest",
     "sourceActivity": "Saved from an activity",
     "viewActivity": "View activity",
-    "importedFrom": "Imported from {filename}"
+    "importedFrom": "Imported from {filename}",
+    "sharedNotFound": "This link is invalid, was revoked, or public links are turned off.",
+    "copied": "Copied from a shared route",
+    "createdBy": "By {name}",
+    "viewCreator": "View creator's profile",
+    "endpointsHidden": "The creator hid the start and end of this route."
   },
   "actions": {
     "menu": "Route actions",
     "edit": "Edit",
     "delete": "Delete",
     "export": "Download GPX",
-    "exportError": "Couldn't download the route."
+    "exportError": "Couldn't download the route.",
+    "share": "Share",
+    "copy": "Save to my routes"
   },
   "import": {
     "title": "Import routes",
@@ -91,5 +99,54 @@
     "danger": "Hazard",
     "shelter": "Shelter",
     "toilet": "Toilet"
+  },
+  "copy": {
+    "success": "Route saved to your routes.",
+    "error": "Couldn't save the route."
+  },
+  "share": {
+    "title": "Share route",
+    "description": "Choose who can see this route and how much of it they see.",
+    "close": "Close",
+    "done": "Done",
+    "save": "Save",
+    "saved": "Sharing settings saved.",
+    "saveError": "Couldn't save the sharing settings.",
+    "visibility": {
+      "label": "Who can see this route",
+      "public": "Public",
+      "followers": "Followers",
+      "private": "Only me",
+      "publicHint": "Everyone on this server, and anyone on the web if public links are on.",
+      "followersHint": "Only people who follow you.",
+      "privateHint": "Only you, plus anyone you send a link to."
+    },
+    "hideEndpoints": {
+      "label": "Hide start and end",
+      "none": "Don't hide",
+      "hint": "Others see the route without this distance at each end, including downloads and copies."
+    },
+    "link": {
+      "title": "Link",
+      "hint": "Anyone with the link can view and download the route, whatever its visibility. Links work only when the server allows public links.",
+      "create": "Create link",
+      "copy": "Copy link",
+      "rotate": "New link",
+      "revoke": "Turn off link",
+      "copied": "Link copied.",
+      "copyError": "Couldn't copy the link.",
+      "revoked": "Link turned off.",
+      "error": "Couldn't update the link."
+    },
+    "homeWarning": {
+      "start": "This route starts near where many of your activities start, which may reveal where you live. Consider hiding the start and end.",
+      "end": "This route ends near where many of your activities start, which may reveal where you live. Consider hiding the start and end.",
+      "both": "This route starts and ends near where many of your activities start, which may reveal where you live. Consider hiding the start and end."
+    }
+  },
+  "profile": {
+    "ownEmptyTitle": "No routes yet",
+    "ownEmptyDescription": "Routes you import or save appear here. Others see only the ones you share.",
+    "otherEmptyTitle": "No routes to show"
   }
 }

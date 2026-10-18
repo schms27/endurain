@@ -7,6 +7,7 @@ import { Activity as ActivityIcon, Settings, UserX } from '@lucide/vue'
 import UserProfileHeader from '@/features/users/components/UserProfileHeader.vue'
 import FollowButton from '@/features/followers/components/FollowButton.vue'
 import FollowerListItem from '@/features/followers/components/FollowerListItem.vue'
+import UserRoutesList from '@/features/routes/components/UserRoutesList.vue'
 import UserDistanceStats from '@/features/home/components/UserDistanceStats.vue'
 import UserGoalResults from '@/features/home/components/UserGoalResults.vue'
 import HomeActivityCard from '@/features/home/components/HomeActivityCard.vue'
@@ -33,7 +34,7 @@ import {
   useFollowingQuery,
 } from '@/features/followers/composables/useFollowers'
 
-type TabKey = 'activities' | 'following' | 'followers'
+type TabKey = 'activities' | 'routes' | 'following' | 'followers'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -69,7 +70,7 @@ const goalResults = useGoalResultsQuery(() => isSelf.value)
 
 // --- Tabs ---
 const initialTab: TabKey =
-  route.query.tab === 'followers' || route.query.tab === 'following'
+  route.query.tab === 'followers' || route.query.tab === 'following' || route.query.tab === 'routes'
     ? route.query.tab
     : 'activities'
 // reka-ui's Tabs model is a plain string, so keep the ref widened to `string`.
@@ -235,8 +236,9 @@ function refetchFollowers(): void {
     <!-- Content -->
     <section class="lg:col-span-9">
       <Tabs v-model="activeTab" class="flex flex-col">
-        <TabsList class="grid grid-cols-3">
+        <TabsList class="grid grid-cols-4">
           <TabsTrigger value="activities">{{ t('userProfile.tabs.activities') }}</TabsTrigger>
+          <TabsTrigger value="routes">{{ t('userProfile.tabs.routes') }}</TabsTrigger>
           <TabsTrigger value="following">{{ t('userProfile.tabs.following') }}</TabsTrigger>
           <TabsTrigger value="followers">{{ t('userProfile.tabs.followers') }}</TabsTrigger>
         </TabsList>
@@ -329,6 +331,16 @@ function refetchFollowers(): void {
         </TabsContent>
 
         <!-- Following -->
+        <!-- Routes visible to the viewer -->
+        <TabsContent value="routes" class="flex flex-col gap-3">
+          <UserRoutesList
+            :user-id="profileId"
+            :is-self="isSelf"
+            :units="units"
+            :active="activeTab === 'routes'"
+          />
+        </TabsContent>
+
         <TabsContent value="following" class="flex flex-col gap-3">
           <Card>
             <div v-if="followingQuery.isPending.value" class="flex flex-col gap-3" aria-busy="true">

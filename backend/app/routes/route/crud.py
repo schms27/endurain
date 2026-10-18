@@ -1,21 +1,86 @@
 """CRUD operations for planned routes."""
 
+import secrets
+
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 import activities.activity.crud as activity_crud
+import activities.activity.models as activity_models
 import activities.activity_streams.constants as activity_streams_constants
 import activities.activity_streams.crud as activity_streams_crud
+import activities.activity_streams.models as activity_streams_models
 import core.decorators as core_decorators
+import core.geo as core_geo
 import core.sanitization as core_sanitization
 import routes.constants as routes_constants
 import routes.route.models as route_models
 import routes.route.schema as route_schema
 import routes.route.utils as route_utils
 import routes.route_file_import.parsers as route_parsers
+import server_settings.utils as server_settings_utils
+import users.users.models as users_models
 
 _Route = route_models.Route
+_NOT_FOUND = "Route not found"
+
+
+def present_route(route: route_models.Route, *, is_owner: bool) -> route_schema.RouteRead:
+    """
+    Shape a route for its viewer.
+
+    The owner sees everything. Everyone else loses the owner-only fields
+    and, when ``hide_endpoints_m`` is set, sees the trimmed geometry with
+    statistics recomputed and points of interest near the hidden ends
+    removed.
+
+    Args:
+        route: The route ORM instance.
+        is_owner: Whether the viewer owns the route.
+
+    Returns:
+        The route as the viewer may see it.
+    """
+    read = route_schema.RouteRead.model_validate(route)
+    if is_owner:
+        return read.model_copy(update={"is_owner": True})
+
+    updates: dict[str, object] = {
+        "is_owner": False,
+        "share_token": None,
+        "source_activity_id": None,
+        "original_filename": None,
+    }
+    hidden = route.hide_endpoints_m or 0
+    if hidden > 0:
+        trimmed = route_utils.trim_endpoints(route.geometry, hidden)
+        ends = [(route.start_lat, route.start_lon), (route.end_lat, route.end_lon)]
+        updates["geometry"] = trimmed
+        updates["waypoints"] = [
+            poi for poi in read.waypoints if not route_utils.near_any(poi.lat, poi.lon, ends, hidden)
+        ]
+        try:
+            stats = route_utils.build_route_geometry([(point[0], point[1], point[2]) for point in trimmed])
+        except route_utils.RouteGeometryError:
+            updates.update(
+                distance=0.0,
+                elevation_gain=None,
+                elevation_loss=None,
+                elevation_min=None,
+                elevation_max=None,
+                is_loop=False,
+            )
+        else:
+            updates.update(
+                distance=stats.distance,
+                elevation_gain=stats.elevation_gain,
+                elevation_loss=stats.elevation_loss,
+                elevation_min=stats.elevation_min,
+                elevation_max=stats.elevation_max,
+                is_loop=stats.is_loop,
+            )
+    return read.model_copy(update=updates)
 
 
 def _clean_name(name: str | None, fallback: str) -> str:
@@ -79,7 +144,7 @@ def _store(
     except Exception:
         db.rollback()
         raise
-    return route_schema.RouteRead.model_validate(route)
+    return present_route(route, is_owner=True)
 
 
 def import_route(
@@ -247,6 +312,48 @@ def list_routes(
     )
 
 
+@core_decorators.handle_db_errors
+def list_user_routes(
+    owner_id: int,
+    viewer_id: int,
+    db: Session,
+    *,
+    page_number: int = 1,
+    num_records: int = 25,
+) -> route_schema.RoutesPage:
+    """
+    One page of a user's routes that the viewer may see, newest first.
+
+    Args:
+        owner_id: User whose routes are listed.
+        viewer_id: Requesting user ID.
+        db: Database session.
+        page_number: 1-based page number.
+        num_records: Page size.
+
+    Returns:
+        The visible routes on the page (trimmed for non-owners) and the
+        total count.
+    """
+    is_owner = owner_id == viewer_id
+    conditions = [_Route.user_id == owner_id]
+    if not is_owner:
+        conditions.append(activity_crud.owner_visibility_condition(_Route, viewer_id))
+
+    total = db.scalar(select(func.count(_Route.id)).where(*conditions)) or 0
+    rows = db.scalars(
+        select(_Route)
+        .where(*conditions)
+        .order_by(_Route.created_at.desc(), _Route.id.desc())
+        .offset((page_number - 1) * num_records)
+        .limit(num_records)
+    ).all()
+    return route_schema.RoutesPage(
+        records=[route_schema.RouteSummary.model_validate(present_route(row, is_owner=is_owner)) for row in rows],
+        total=int(total),
+    )
+
+
 def get_owned_route_model(route_id: int, user_id: int, db: Session) -> route_models.Route:
     """
     Get one of the user's routes, or raise 404.
@@ -264,13 +371,14 @@ def get_owned_route_model(route_id: int, user_id: int, db: Session) -> route_mod
     """
     route = db.scalar(select(_Route).where(_Route.id == route_id, _Route.user_id == user_id))
     if route is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Route not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
     return route
 
 
-def get_route(route_id: int, user_id: int, db: Session) -> route_schema.RouteRead:
+def get_visible_route_model(route_id: int, user_id: int, db: Session) -> route_models.Route:
     """
-    Get one of the user's routes.
+    Get a route the user owns or may see (public, or followers-only for an
+    accepted follower), or raise 404.
 
     Args:
         route_id: Route ID.
@@ -278,12 +386,39 @@ def get_route(route_id: int, user_id: int, db: Session) -> route_schema.RouteRea
         db: Database session.
 
     Returns:
-        The route.
+        The route ORM instance.
 
     Raises:
-        HTTPException: 404 if missing or not owned.
+        HTTPException: 404 if missing or not visible.
     """
-    return route_schema.RouteRead.model_validate(get_owned_route_model(route_id, user_id, db))
+    route = db.scalar(
+        select(_Route).where(
+            _Route.id == route_id,
+            or_(_Route.user_id == user_id, activity_crud.owner_visibility_condition(_Route, user_id)),
+        )
+    )
+    if route is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
+    return route
+
+
+def get_route(route_id: int, user_id: int, db: Session) -> route_schema.RouteRead:
+    """
+    Get a route the user owns or may see.
+
+    Args:
+        route_id: Route ID.
+        user_id: Requesting user ID.
+        db: Database session.
+
+    Returns:
+        The route, trimmed for non-owners.
+
+    Raises:
+        HTTPException: 404 if missing or not visible.
+    """
+    route = get_visible_route_model(route_id, user_id, db)
+    return present_route(route, is_owner=route.user_id == user_id)
 
 
 def edit_route(
@@ -316,13 +451,272 @@ def edit_route(
         route.description = core_sanitization.sanitize_markdown(description) if description else None
     if "activity_type" in changes:
         route.activity_type = changes["activity_type"]
+    if changes.get("visibility") is not None:
+        route.visibility = int(changes["visibility"])
+    if changes.get("hide_endpoints_m") is not None:
+        route.hide_endpoints_m = changes["hide_endpoints_m"]
+    return _commit(route, db)
+
+
+def _commit(route: route_models.Route, db: Session) -> route_schema.RouteRead:
+    """
+    Commit changes to an owned route and return the owner's view.
+
+    Args:
+        route: The modified route.
+        db: Database session.
+
+    Returns:
+        The updated route.
+    """
     try:
         db.commit()
         db.refresh(route)
     except Exception:
         db.rollback()
         raise
-    return route_schema.RouteRead.model_validate(route)
+    return present_route(route, is_owner=True)
+
+
+def create_share_token(route_id: int, user_id: int, db: Session) -> route_schema.RouteRead:
+    """
+    Create or rotate a route's unlisted share link.
+
+    Rotating invalidates the previous link.
+
+    Args:
+        route_id: Route ID.
+        user_id: Requesting user ID (must own the route).
+        db: Database session.
+
+    Returns:
+        The route with its new share token.
+
+    Raises:
+        HTTPException: 404 if missing or not owned.
+    """
+    route = get_owned_route_model(route_id, user_id, db)
+    route.share_token = secrets.token_urlsafe(routes_constants.SHARE_TOKEN_BYTES)
+    return _commit(route, db)
+
+
+def revoke_share_token(route_id: int, user_id: int, db: Session) -> route_schema.RouteRead:
+    """
+    Revoke a route's unlisted share link.
+
+    Args:
+        route_id: Route ID.
+        user_id: Requesting user ID (must own the route).
+        db: Database session.
+
+    Returns:
+        The route without a share token.
+
+    Raises:
+        HTTPException: 404 if missing or not owned.
+    """
+    route = get_owned_route_model(route_id, user_id, db)
+    route.share_token = None
+    return _commit(route, db)
+
+
+def _public_link_settings(db: Session) -> tuple[bool, bool]:
+    """
+    Read the public-link server settings.
+
+    Args:
+        db: Database session.
+
+    Returns:
+        Tuple of (public links enabled, creator info shown on public links).
+    """
+    settings = server_settings_utils.get_server_settings_or_404(db)
+    return bool(settings.public_shareable_links), bool(settings.public_shareable_links_user_info)
+
+
+def get_shared_route_model(token: str, db: Session) -> route_models.Route:
+    """
+    Get a route by its unlisted share token, or raise 404.
+
+    Share links work only while public shareable links are enabled, and
+    regardless of the route's visibility.
+
+    Args:
+        token: Share token.
+        db: Database session.
+
+    Returns:
+        The route ORM instance.
+
+    Raises:
+        HTTPException: 404 if links are disabled or the token is unknown.
+    """
+    links_enabled, _ = _public_link_settings(db)
+    route = db.scalar(select(_Route).where(_Route.share_token == token)) if links_enabled else None
+    if route is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
+    return route
+
+
+def get_public_route_model(route_id: int, db: Session) -> route_models.Route:
+    """
+    Get a public route for an anonymous viewer, or raise 404.
+
+    Args:
+        route_id: Route ID.
+        db: Database session.
+
+    Returns:
+        The route ORM instance.
+
+    Raises:
+        HTTPException: 404 if links are disabled or the route is not public.
+    """
+    links_enabled, _ = _public_link_settings(db)
+    route = (
+        db.scalar(select(_Route).where(_Route.id == route_id, activity_crud.owner_visibility_condition(_Route, None)))
+        if links_enabled
+        else None
+    )
+    if route is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
+    return route
+
+
+def present_public_route(route: route_models.Route, db: Session) -> route_schema.PublicRouteRead:
+    """
+    Shape a route for its public page.
+
+    Args:
+        route: The route ORM instance.
+        db: Database session.
+
+    Returns:
+        The route as a non-owner sees it, with its creator when the server
+        shares user info on public links.
+    """
+    _, show_user_info = _public_link_settings(db)
+    owner = None
+    if show_user_info:
+        user = db.get(users_models.Users, route.user_id)
+        if user is not None:
+            owner = route_schema.RouteOwner(id=user.id, name=user.name, username=user.username)
+    view = present_route(route, is_owner=False)
+    return route_schema.PublicRouteRead(**dict(view), owner=owner)
+
+
+def copy_route(route: route_models.Route, user_id: int, db: Session) -> route_schema.RouteRead:
+    """
+    Save a copy of a route the user may see into their library.
+
+    The copy is built from what the user sees (the trimmed geometry for
+    someone else's route), is private, and points back to the original.
+
+    Args:
+        route: The source route, already access-checked.
+        user_id: Requesting user ID (owner of the copy).
+        db: Database session.
+
+    Returns:
+        The new route.
+
+    Raises:
+        HTTPException: 400 if too little of the route is visible to copy.
+    """
+    view = present_route(route, is_owner=route.user_id == user_id)
+    try:
+        geometry = route_utils.build_route_geometry([(point[0], point[1], point[2]) for point in view.geometry])
+    except route_utils.RouteGeometryError as err:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err)) from err
+    return _store(
+        user_id,
+        geometry,
+        db,
+        name=view.name,
+        description=view.description,
+        activity_type=view.activity_type,
+        source=routes_constants.RouteSource.COPY.value,
+        source_activity_id=None,
+        source_route_id=route.id,
+        original_filename=None,
+        waypoints=[poi.model_dump(mode="json") for poi in view.waypoints],
+        city=route.city,
+        town=route.town,
+        country=route.country,
+    )
+
+
+def _frequent_start_near(user_id: int, lat: float, lon: float, db: Session) -> bool:
+    """
+    Check whether several of the user's activities start near a point.
+
+    Activities are pre-filtered by bounding box; then the first GPS sample
+    of each candidate is compared with the point.
+
+    Args:
+        user_id: Owner user ID.
+        lat: Latitude of the point.
+        lon: Longitude of the point.
+        db: Database session.
+
+    Returns:
+        True if at least ``HOME_MIN_ACTIVITIES`` activities start within
+        ``HOME_RADIUS_M`` of the point.
+    """
+    radius = routes_constants.HOME_RADIUS_M
+    box = core_geo.BoundingBox(lat, lon, lat, lon).padded(radius)
+    activity = activity_models.Activity
+    stream = activity_streams_models.ActivityStreams
+    rows = db.execute(
+        select(
+            stream.stream_waypoints[(0, "lat")].as_float(),
+            stream.stream_waypoints[(0, "lon")].as_float(),
+        )
+        .join(activity, activity.id == stream.activity_id)
+        .where(
+            activity.user_id == user_id,
+            stream.stream_type == activity_streams_constants.STREAM_TYPE_MAP,
+            activity.bbox_min_lat <= box.max_lat,
+            activity.bbox_max_lat >= box.min_lat,
+            activity.bbox_min_lon <= box.max_lon,
+            activity.bbox_max_lon >= box.min_lon,
+        )
+    ).all()
+    starts = [
+        (start_lat, start_lon) for start_lat, start_lon in rows if start_lat is not None and start_lon is not None
+    ]
+    nearby = sum(1 for start in starts if route_utils.near_any(lat, lon, [start], radius))
+    return nearby >= routes_constants.HOME_MIN_ACTIVITIES
+
+
+@core_decorators.handle_db_errors
+def home_location_warning(route_id: int, user_id: int, db: Session) -> route_schema.RouteHomeWarning:
+    """
+    Check whether a route's visible endpoints may reveal the owner's home.
+
+    Uses the endpoints other users see, so trimming enough clears the
+    warning.
+
+    Args:
+        route_id: Route ID.
+        user_id: Requesting user ID (must own the route).
+        db: Database session.
+
+    Returns:
+        Which visible endpoints lie near a frequent activity start.
+
+    Raises:
+        HTTPException: 404 if missing or not owned.
+    """
+    route = get_owned_route_model(route_id, user_id, db)
+    visible = route_utils.trim_endpoints(route.geometry, route.hide_endpoints_m or 0)
+    if len(visible) < 2:
+        return route_schema.RouteHomeWarning(start_near_home=False, end_near_home=False)
+    (start_lat, start_lon), (end_lat, end_lon) = visible[0][:2], visible[-1][:2]
+    return route_schema.RouteHomeWarning(
+        start_near_home=_frequent_start_near(user_id, start_lat, start_lon, db),
+        end_near_home=_frequent_start_near(user_id, end_lat, end_lon, db),
+    )
 
 
 def delete_route(route_id: int, user_id: int, db: Session) -> None:

@@ -9,6 +9,7 @@ import pytest
 import core.geo as core_geo
 import routes.constants as routes_constants
 import routes.route.export as route_export
+import routes.route.schema as route_schema
 import routes.route.utils as route_utils
 import routes.route_file_import.parsers as parsers
 
@@ -82,7 +83,7 @@ def test_gpx_export_round_trip():
         name="Castle loop",
         description="Climb",
         geometry=[[38.7, -9.1, 10.0], [38.71, -9.1, None]],
-        waypoints=[{"name": "Water", "description": None, "kind": "water", "lat": 38.705, "lon": -9.1, "ele": 12.0}],
+        waypoints=[route_schema.RoutePoi(name="Water", kind="water", lat=38.705, lon=-9.1, ele=12.0)],
         created_at=datetime(2024, 1, 1, tzinfo=UTC),
     )
     parsed = parsers.parse_gpx(route_export.to_gpx(route).encode())
@@ -90,3 +91,36 @@ def test_gpx_export_round_trip():
     assert parsed.points == [(38.7, -9.1, 10.0), (38.71, -9.1, None)]
     [poi] = parsed.pois
     assert (poi.name, poi.kind, poi.ele) == ("Water", routes_constants.PoiKind.WATER, 12.0)
+
+
+def _as_geometry(points):
+    return [list(point) for point in points]
+
+
+def test_trim_endpoints_cuts_both_ends():
+    geometry = _as_geometry(_points([(0.0, 0.0), (500.0, 0.0), (1000.0, 0.0)], ele_step=10))
+    trimmed = route_utils.trim_endpoints(geometry, 200)
+    lats = [point[0] for point in trimmed]
+    lons = [point[1] for point in trimmed]
+    cumulative = core_geo.cumulative_distance_m(lats, lons)
+    assert float(cumulative[-1]) == pytest.approx(600.0, rel=0.01)
+    assert float(core_geo.haversine_m(*geometry[0][:2], *trimmed[0][:2])) == pytest.approx(200.0, rel=0.01)
+    assert float(core_geo.haversine_m(*geometry[-1][:2], *trimmed[-1][:2])) == pytest.approx(200.0, rel=0.01)
+    # The cut points interpolate elevation; the middle vertex is kept as is.
+    assert trimmed[0][2] == pytest.approx(104.0, abs=0.1)
+    assert trimmed[1] == geometry[1]
+
+
+def test_trim_endpoints_edge_cases():
+    geometry = _as_geometry(_points([(0.0, 0.0), (300.0, 0.0)]))
+    assert route_utils.trim_endpoints(geometry, 0) == geometry
+    assert route_utils.trim_endpoints(geometry, 150) == []
+    trimmed = route_utils.trim_endpoints(geometry, 100)
+    assert len(trimmed) == 2
+    assert trimmed[0][2] is None
+
+
+def test_near_any():
+    (lat, lon, _), (far_lat, far_lon, _) = _points([(0.0, 0.0), (500.0, 0.0)])
+    assert route_utils.near_any(lat, lon, [(far_lat, far_lon), (lat, lon)], 10)
+    assert not route_utils.near_any(lat, lon, [(far_lat, far_lon)], 400)

@@ -5,15 +5,24 @@ import type { RouteDetailDto, RoutePoint } from '@/features/routes/types'
 import { apiFetch } from '@/services/http'
 import {
   assertValidRouteFile,
+  copyRoute,
   createRouteFromActivity,
+  createRouteShareToken,
   deleteRoute,
   exportRouteGpx,
+  exportSharedRouteGpx,
   fetchRoute,
+  fetchRouteHomeWarning,
   fetchRoutes,
+  fetchSharedRoute,
+  fetchUserRoutes,
   importRouteFile,
   mapRouteDetail,
+  revokeRouteShareToken,
   RouteFileValidationError,
+  routeShareUrl,
   updateRoute,
+  updateRouteSharing,
 } from '@/features/routes/services/routes'
 import { MAX_ROUTE_FILE_BYTES } from '@/features/routes/types'
 import {
@@ -33,6 +42,7 @@ const routeDto: RouteDetailDto = {
   name: 'Castle loop',
   activity_type: null,
   source: 1,
+  visibility: 2,
   distance: 1234.5,
   elevation_gain: 40,
   elevation_loss: 38,
@@ -42,7 +52,11 @@ const routeDto: RouteDetailDto = {
   created_at: '2024-01-01T00:00:00Z',
   description: null,
   source_activity_id: null,
+  source_route_id: null,
   original_filename: 'castle.gpx',
+  share_token: 'secret-token',
+  hide_endpoints_m: 200,
+  is_owner: true,
   geometry: [
     [38.7, -9.1, 10],
     [38.71, -9.1, null],
@@ -86,6 +100,87 @@ describe('routes service', () => {
     ])
     expect(route.originalFilename).toBe('castle.gpx')
     expect(route.isLoop).toBe(true)
+    expect(route).toMatchObject({
+      userId: 1,
+      visibility: 2,
+      shareToken: 'secret-token',
+      hideEndpointsM: 200,
+      isOwner: true,
+      sourceRouteId: null,
+    })
+  })
+
+  it('reads shared routes without auth, by token or public id', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({
+      ...routeDto,
+      is_owner: false,
+      share_token: null,
+      owner: { id: 1, name: 'Ana', username: 'ana' },
+    })
+    const shared = await fetchSharedRoute({ token: 'a/b' })
+    expect(vi.mocked(apiFetch).mock.calls[0]).toEqual([
+      '/public/routes/by_token/a%2Fb',
+      { auth: false, signal: undefined },
+    ])
+    expect(shared.owner).toEqual({ id: 1, name: 'Ana', username: 'ana' })
+    expect(shared.isOwner).toBe(false)
+
+    vi.mocked(apiFetch).mockResolvedValue({ ...routeDto, owner: null })
+    expect((await fetchSharedRoute({ publicId: 7 })).owner).toBeNull()
+    expect(vi.mocked(apiFetch).mock.calls[1]?.[0]).toBe('/public/routes/7')
+
+    await exportSharedRouteGpx({ publicId: 7 })
+    expect(vi.mocked(apiFetch).mock.calls[2]).toEqual([
+      '/public/routes/7/export',
+      { auth: false, responseType: 'blob' },
+    ])
+  })
+
+  it('lists the routes on a profile', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({ records: [routeDto], total: 1 })
+    const page = await fetchUserRoutes(5, { page: 2, numRecords: 10 })
+    expect(vi.mocked(apiFetch).mock.calls[0]?.[0]).toBe(
+      '/users/5/routes?page_number=2&num_records=10',
+    )
+    expect(page.records[0]?.visibility).toBe(2)
+  })
+
+  it('copies a route by id or share token', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({ ...routeDto, source: 4, source_route_id: 7 })
+    expect((await copyRoute({ id: 7 })).sourceRouteId).toBe(7)
+    await copyRoute({ token: 'tok' })
+    expect(vi.mocked(apiFetch).mock.calls.map((call) => call[0])).toEqual([
+      '/routes/7/copy',
+      '/routes/shared/tok/copy',
+    ])
+    expect(vi.mocked(apiFetch).mock.calls[0]?.[1]).toEqual({ method: 'POST' })
+  })
+
+  it('updates sharing and manages the share link', async () => {
+    vi.mocked(apiFetch).mockResolvedValue(routeDto)
+    await updateRouteSharing(7, { visibility: 0, hideEndpointsM: 500 })
+    expect(vi.mocked(apiFetch).mock.calls[0]).toEqual([
+      '/routes/7',
+      { method: 'PUT', body: JSON.stringify({ visibility: 0, hide_endpoints_m: 500 }) },
+    ])
+    await createRouteShareToken(7)
+    await revokeRouteShareToken(7)
+    expect(vi.mocked(apiFetch).mock.calls.slice(1)).toEqual([
+      ['/routes/7/share_token', { method: 'POST' }],
+      ['/routes/7/share_token', { method: 'DELETE' }],
+    ])
+  })
+
+  it('maps the home-location warning', async () => {
+    vi.mocked(apiFetch).mockResolvedValue({ start_near_home: true, end_near_home: false })
+    expect(await fetchRouteHomeWarning(7)).toEqual({ startNearHome: true, endNearHome: false })
+    expect(vi.mocked(apiFetch).mock.calls[0]?.[0]).toBe('/routes/7/home_warning')
+  })
+
+  it('builds the share link', () => {
+    expect(routeShareUrl('abc_-1', 'https://endurain.example')).toBe(
+      'https://endurain.example/r/abc_-1',
+    )
   })
 
   it('fetches a page with paging and a trimmed search term', async () => {

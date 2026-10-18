@@ -24,11 +24,16 @@ const gain = computed(() =>
     : null,
 )
 const place = computed(() => [props.route.city, props.route.country].filter(Boolean).join(', '))
-const sourceLabel = computed(() =>
-  props.route.source === ROUTE_SOURCE.activity
-    ? t('routes.item.fromActivity')
-    : t('routes.item.imported'),
-)
+const sourceLabel = computed(() => {
+  switch (props.route.source) {
+    case ROUTE_SOURCE.activity:
+      return t('routes.item.fromActivity')
+    case ROUTE_SOURCE.copy:
+      return t('routes.item.copied')
+    default:
+      return t('routes.item.imported')
+  }
+})
 </script>
 
 <template>

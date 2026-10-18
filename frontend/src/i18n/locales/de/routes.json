@@ -18,7 +18,8 @@
   "item": {
     "loop": "Rundkurs",
     "fromActivity": "Aus Aktivität",
-    "imported": "Importiert"
+    "imported": "Importiert",
+    "copied": "Kopiert"
   },
   "stats": {
     "distance": "Distanz",
@@ -31,20 +32,27 @@
   "detail": {
     "back": "Zurück zu den Routen",
     "notFoundTitle": "Route nicht gefunden",
-    "notFoundDescription": "Diese Route existiert nicht oder gehört dir nicht.",
+    "notFoundDescription": "Diese Route existiert nicht oder du kannst sie nicht sehen.",
     "elevation": "Höhenprofil",
     "noElevation": "Diese Route hat keine Höhendaten.",
     "pointsOfInterest": "Wegpunkte",
     "sourceActivity": "Aus einer Aktivität gespeichert",
     "viewActivity": "Aktivität anzeigen",
-    "importedFrom": "Importiert aus {filename}"
+    "importedFrom": "Importiert aus {filename}",
+    "sharedNotFound": "Dieser Link ist ungültig, wurde deaktiviert oder öffentliche Links sind ausgeschaltet.",
+    "copied": "Von einer geteilten Route kopiert",
+    "createdBy": "Von {name}",
+    "viewCreator": "Profil der Person ansehen",
+    "endpointsHidden": "Start und Ende dieser Route wurden ausgeblendet."
   },
   "actions": {
     "menu": "Routenaktionen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "export": "GPX herunterladen",
-    "exportError": "Die Route konnte nicht heruntergeladen werden."
+    "exportError": "Die Route konnte nicht heruntergeladen werden.",
+    "share": "Teilen",
+    "copy": "Zu meinen Routen"
   },
   "import": {
     "title": "Routen importieren",
@@ -91,5 +99,54 @@
     "danger": "Gefahrenstelle",
     "shelter": "Unterstand",
     "toilet": "Toilette"
+  },
+  "copy": {
+    "success": "Route zu deinen Routen hinzugefügt.",
+    "error": "Die Route konnte nicht gespeichert werden."
+  },
+  "share": {
+    "title": "Route teilen",
+    "description": "Lege fest, wer diese Route sehen kann und wie viel davon.",
+    "close": "Schließen",
+    "done": "Fertig",
+    "save": "Speichern",
+    "saved": "Freigabe gespeichert.",
+    "saveError": "Die Freigabe konnte nicht gespeichert werden.",
+    "visibility": {
+      "label": "Wer kann diese Route sehen",
+      "public": "Öffentlich",
+      "followers": "Follower",
+      "private": "Nur ich",
+      "publicHint": "Alle auf diesem Server und alle im Web, wenn öffentliche Links aktiviert sind.",
+      "followersHint": "Nur Personen, die dir folgen.",
+      "privateHint": "Nur du und alle, denen du einen Link schickst."
+    },
+    "hideEndpoints": {
+      "label": "Start und Ende ausblenden",
+      "none": "Nicht ausblenden",
+      "hint": "Andere sehen die Route ohne diese Strecke an beiden Enden, auch in Downloads und Kopien."
+    },
+    "link": {
+      "title": "Link",
+      "hint": "Alle mit dem Link können die Route ansehen und herunterladen, unabhängig von der Sichtbarkeit. Links funktionieren nur, wenn der Server öffentliche Links erlaubt.",
+      "create": "Link erstellen",
+      "copy": "Link kopieren",
+      "rotate": "Neuer Link",
+      "revoke": "Link deaktivieren",
+      "copied": "Link kopiert.",
+      "copyError": "Der Link konnte nicht kopiert werden.",
+      "revoked": "Link deaktiviert.",
+      "error": "Der Link konnte nicht geändert werden."
+    },
+    "homeWarning": {
+      "start": "Diese Route beginnt dort, wo viele deiner Aktivitäten starten. Das könnte verraten, wo du wohnst. Blende Start und Ende besser aus.",
+      "end": "Diese Route endet dort, wo viele deiner Aktivitäten starten. Das könnte verraten, wo du wohnst. Blende Start und Ende besser aus.",
+      "both": "Diese Route beginnt und endet dort, wo viele deiner Aktivitäten starten. Das könnte verraten, wo du wohnst. Blende Start und Ende besser aus."
+    }
+  },
+  "profile": {
+    "ownEmptyTitle": "Noch keine Routen",
+    "ownEmptyDescription": "Hier erscheinen Routen, die du importierst oder speicherst. Andere sehen nur die, die du teilst.",
+    "otherEmptyTitle": "Keine Routen zu sehen"
   }
 }
