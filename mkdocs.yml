@@ -1,5 +1,6 @@
 site_name: Endurain documentation
-repo_url: https://github.com/endurain-project/endurain
+site_url: https://schms27.github.io/endurain/
+repo_url: https://github.com/schms27/endurain
 theme:
   name: material
   logo: assets/brand_logo_light_theme.png
@@ -38,7 +39,6 @@ extra_css:
 extra_javascript:
   - assets/javascripts/secret-tools.js
 plugins:
-  - blog
   - search
   - mkdocstrings:
       handlers:
@@ -49,8 +49,6 @@ plugins:
             separate_signature: true
 nav:
   - Home: index.md
-  - Blog:
-    - blog/index.md
   - Hosting Guide:
     - Getting started easy: getting-started/getting-started.md
     - Getting started advanced: getting-started/advanced-started.md

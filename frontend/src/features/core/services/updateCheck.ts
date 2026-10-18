@@ -1,11 +1,10 @@
 import { apiFetch } from '@/services/http'
 
 /** The GitHub API endpoint for the latest stable release of Endurain. */
-const LATEST_RELEASE_URL = 'https://api.github.com/repos/endurain-project/endurain/releases/latest'
+const LATEST_RELEASE_URL = 'https://api.github.com/repos/schms27/endurain/releases/latest'
 
 /** The GitHub API endpoint listing recent releases (includes pre-releases). */
-const RELEASES_LIST_URL =
-  'https://api.github.com/repos/endurain-project/endurain/releases?per_page=10'
+const RELEASES_LIST_URL = 'https://api.github.com/repos/schms27/endurain/releases?per_page=10'
 
 /** Minimal shape returned by the backend `/about` endpoint. */
 export interface AboutResponse {

@@ -1,6 +1,3 @@
-> [!NOTE]
-> **Endurain is on a temporary feature freeze** - The project is not paused. The focus is shifting from new features to strengthening the foundations. More details [here](https://docs.endurain.com/blog/2026/05/23/pausing-new-features-so-endurain-can-keep-growing/)
-
 <div align="center">
   <img src="logo/brand_logo_dark_theme.png" width="128" height="128">
 
@@ -8,8 +5,8 @@
 
   <a href="https://translate.codeberg.org/engage/endurain/"><img src="https://translate.codeberg.org/widget/endurain/svg-badge.svg" alt="Translation status"></a>
   [![License](https://img.shields.io/badge/license-AGPL%20v3-blue)](./LICENSE)
-  [![Release](https://img.shields.io/github/v/release/endurain-project/endurain?label=release&color=blue)](https://github.com/endurain-project/endurain/releases)
-  [![Stars](https://img.shields.io/github/stars/endurain-project/endurain?label=stars&logo=github)](https://github.com/endurain-project/endurain)
+  [![Release](https://img.shields.io/github/v/release/schms27/endurain?label=release&color=blue)](https://github.com/schms27/endurain/releases)
+  [![Stars](https://img.shields.io/github/stars/schms27/endurain?label=stars&logo=github)](https://github.com/schms27/endurain)
   [![Trademark Policy](https://img.shields.io/badge/trademark-Endurain%E2%84%A2-blue)](./TRADEMARK.md)
 
   **A self-hosted fitness tracking service**  
@@ -32,9 +29,9 @@ Experience Endurain without installation:
 
 ## Table of Contents
 
-- [Endurain documentation](https://docs.endurain.com)
+- [Endurain documentation](https://schms27.github.io/endurain/)
 - [What is Endurain?](#what-is-endurain)
-- [Endurain screenshots](https://docs.endurain.com/gallery/)
+- [Endurain screenshots](https://schms27.github.io/endurain/gallery/)
 - [Sponsors](#sponsors)
 - [Contributing](#contributing)
 - [Help Translate](#help-translate)
@@ -52,7 +49,7 @@ Endurain is a self-hosted fitness tracking service designed to give users full c
 
 To deploy Endurain, a Docker image is available, and a comprehensive example can be found in the "docker-compose.yml.example" file provided. Configuration is facilitated through environment variables, ensuring flexibility and ease of customization.
 
-For more information please see the Endurain's [documentation](https://docs.endurain.com).
+For more information please see the Endurain's [documentation](https://schms27.github.io/endurain/).
 
 ## Sponsors
 
@@ -89,3 +86,11 @@ See [`TRADEMARK.md`](./TRADEMARK.md) for full details.
 <div align="center">
   <sub>Built with ❤️ from Portugal | Part of the <a href="https://github.com/endurain-project">Endurain</a> ecosystem</sub>
 </div>
+
+---
+
+## Fork Disclaimer
+
+This repository ([schms27/endurain](https://github.com/schms27/endurain)) is **a fork of Endurain** ([endurain-project/endurain](https://github.com/endurain-project/endurain)). It is **not the official Endurain project**, and it is not sponsored, endorsed by, or affiliated with the Endurain project or João Vitória Silva. Changes made in this fork are its own and are not necessarily part of upstream Endurain.
+
+Endurain® is a registered trademark of João Vitória Silva. The code remains licensed under AGPL-3.0; see [`LICENSE`](LICENSE) and [`TRADEMARK.md`](TRADEMARK.md).

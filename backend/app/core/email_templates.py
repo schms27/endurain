@@ -26,7 +26,7 @@ INFO_BG = "#e1f5ee"  # brand secondary tint for informational details
 INFO_BORDER = "#bfe6d8"
 INFO_TEXT = BRAND_PRIMARY_DARK
 
-_LOGO_URL = "https://raw.githubusercontent.com/endurain-project/endurain/master/frontend/public/logo_light.png"
+_LOGO_URL = "https://raw.githubusercontent.com/schms27/endurain/master/frontend/public/logo_light.png"
 
 
 def html_header(title: str, heading: str, lang: str = "en") -> str:
@@ -140,7 +140,7 @@ def html_footer(
                 </a> - {source_code_label}
                 <a
                     style="color: {link_color};"
-                    href="https://github.com/endurain-project/endurain"
+                    href="https://github.com/schms27/endurain"
                 >
                     GitHub
                 </a>

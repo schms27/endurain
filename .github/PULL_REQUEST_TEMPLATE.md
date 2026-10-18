@@ -2,21 +2,6 @@
  
 A clear description of the change.
 
-## Feature freeze note
-
-Endurain is currently in a temporary feature freeze.
-
-Preferred PRs during this period:
-
-- Bug fixes
-- Security fixes
-- Refactors/code quality improvements
-- Tests
-- Documentation
-- Translation and maintenance updates
-
-Large new user-facing features and major integrations are generally deferred until after the freeze unless previously discussed and acknowledged.
- 
 ## Related issue
  
 Required for anything beyond a small bug fix or typo.
