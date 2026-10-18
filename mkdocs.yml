@@ -39,7 +39,6 @@ extra_css:
 extra_javascript:
   - assets/javascripts/secret-tools.js
 plugins:
-  - blog
   - search
   - mkdocstrings:
       handlers:
@@ -50,8 +49,6 @@ plugins:
             separate_signature: true
 nav:
   - Home: index.md
-  - Blog:
-    - blog/index.md
   - Hosting Guide:
     - Getting started easy: getting-started/getting-started.md
     - Getting started advanced: getting-started/advanced-started.md

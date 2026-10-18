@@ -1,6 +1,3 @@
-> [!NOTE]
-> **Endurain is on a temporary feature freeze** - The project is not paused. The focus is shifting from new features to strengthening the foundations. More details [here](https://schms27.github.io/endurain/blog/2026/05/23/pausing-new-features-so-endurain-can-keep-growing/)
-
 <div align="center">
   <img src="logo/brand_logo_dark_theme.png" width="128" height="128">
 
