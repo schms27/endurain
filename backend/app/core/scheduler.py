@@ -5,6 +5,7 @@ from collections.abc import Callable, Sequence
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import activities.activity.utils as activities_utils
+import activities.activity_auto_import.utils as auto_import_utils
 import auth.maintenance as auth_maintenance
 import core.logger as core_logger
 import core.network as core_network
@@ -138,6 +139,14 @@ def start_scheduler() -> None:
     )
 
     add_scheduler_job(
+        auto_import_utils.run_due_auto_imports,
+        "interval",
+        5,
+        [],
+        "import new files from users auto import folders",
+    )
+
+    add_scheduler_job(
         core_network.refresh_trusted_proxy_hostnames,
         "interval",
         1,
@@ -211,6 +220,41 @@ def schedule_missing_thumbnail_generation() -> None:
     except Exception as err:
         core_logger.print_to_log(
             f"Failed to schedule missing thumbnail generation job: {type(err).__name__}",
+            "error",
+            exc=err,
+        )
+
+
+def schedule_user_auto_import(user_id: int) -> None:
+    """
+    Queue a one-shot scan of one user's auto import folder.
+
+    Runs on the scheduler's executor instead of the request
+    threadpool. Repeated calls coalesce into a single pending
+    run per user via a fixed job id.
+
+    Args:
+        user_id: User whose folder to scan.
+
+    Returns:
+        None.
+
+    Raises:
+        None.
+    """
+    try:
+        scheduler.add_job(
+            auto_import_utils.run_user_auto_import,
+            "date",
+            args=[user_id],
+            id=f"endurain_auto_import_user_{user_id}",
+            replace_existing=True,
+            misfire_grace_time=None,
+        )
+        core_logger.print_to_log(f"Scheduled one-shot auto import for user {user_id}")
+    except Exception as err:
+        core_logger.print_to_log(
+            f"Failed to schedule auto import for user {user_id}: {type(err).__name__}",
             "error",
             exc=err,
         )

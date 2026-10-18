@@ -47,7 +47,24 @@ class TestStartScheduler:
             from core.scheduler import start_scheduler
 
             start_scheduler()
-            assert mock_add_job.call_count == 14
+            assert mock_add_job.call_count == 15
+
+    def test_auto_import_job_registered(self):
+        """Due auto imports are checked every five minutes."""
+        import activities.activity_auto_import.utils as auto_import_utils
+
+        with (
+            patch("core.scheduler.scheduler") as mock_scheduler,
+            patch("core.scheduler.add_scheduler_job") as mock_add_job,
+        ):
+            mock_scheduler.running = False
+            from core.scheduler import start_scheduler
+
+            start_scheduler()
+
+        calls = [c for c in mock_add_job.call_args_list if c.args[0] is auto_import_utils.run_due_auto_imports]
+        assert len(calls) == 1
+        assert calls[0].args[1:3] == ("interval", 5)
 
     def test_segment_match_queue_job_registered(self):
         """The segment match queue drain runs every minute."""
@@ -129,6 +146,31 @@ class TestAddSchedulerJob:
                 "error",
                 exc=mock_scheduler.add_job.side_effect,
             )
+
+
+class TestScheduleUserAutoImport:
+    def test_adds_one_shot_job_per_user(self):
+        import activities.activity_auto_import.utils as auto_import_utils
+        from core.scheduler import schedule_user_auto_import
+
+        with patch("core.scheduler.scheduler") as mock_scheduler:
+            schedule_user_auto_import(7)
+
+        mock_scheduler.add_job.assert_called_once_with(
+            auto_import_utils.run_user_auto_import,
+            "date",
+            args=[7],
+            id="endurain_auto_import_user_7",
+            replace_existing=True,
+            misfire_grace_time=None,
+        )
+
+    def test_swallows_scheduler_errors(self):
+        from core.scheduler import schedule_user_auto_import
+
+        with patch("core.scheduler.scheduler") as mock_scheduler:
+            mock_scheduler.add_job.side_effect = RuntimeError("down")
+            schedule_user_auto_import(7)
 
 
 class TestStopScheduler:

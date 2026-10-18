@@ -26,6 +26,18 @@ After the files are processed, the files are renamed and moved. Activity files t
 
 The generic bulk import currently only imports data contained in the .fit, .tcx or .gpx files - no external metadata or other media are imported.
 
+## Scheduled automatic import
+
+Each user can have files from their own folder imported automatically, for example a folder a sync tool such as Syncthing writes into:
+- In the "Settings" menu select "Import", and switch on "Automatic import".
+- Choose how often to check for new files (from every 15 minutes to once a day).
+- Place .fit, .tcx, .gz and/or .gpx files into data/activity_files/auto_import/<your username>. The folder is created when you switch the feature on, and its path is shown on the settings card.
+- "Import now" checks the folder immediately, even when the schedule is off.
+
+Files are imported into the account of the user whose folder they are in, and are handled like the generic bulk import: imported files move to data/activity_files/processed, failed ones to data/activity_files/bulk_import/import_errors. Files changed less than a minute ago are left for the next run, so files still being copied are not picked up half-written. The settings card shows when the last run happened and how many files it imported or failed.
+
+The folder is named after the username, so after renaming your account, files go into the folder with the new name.
+
 While each file present in the import directory will only be imported once (and then moved to a storage directory), the bulk import does not check for duplicates while importing. Thus, activities that are already present in Endurain will be imported again (and will default be hidden if their start time matches an existing activity's start time, with a notification prompting the user to review).
 
 GEOCODES API has a limit of 1 Request/Second on the free plan, so if you have a large number of files, it might not be possible to import all in the same action

@@ -6,6 +6,7 @@ import activities.activity.public_router as activities_public_router
 
 # Alphabetized router imports
 import activities.activity.router as activities_router
+import activities.activity_auto_import.router as auto_import_router
 import activities.activity_laps.public_router as activity_laps_public_router
 import activities.activity_laps.router as activity_laps_router
 import activities.activity_media.router as activity_media_router
@@ -275,6 +276,15 @@ router.include_router(
 router.include_router(
     user_default_gear_router.router,
     prefix=core_config.ROOT_PATH + "/profile/default_gear",
+    tags=["profile"],
+    dependencies=[
+        Depends(auth_dependencies.validate_access_token),
+        Security(auth_dependencies.check_scopes, scopes=["profile"]),
+    ],
+)
+router.include_router(
+    auto_import_router.router,
+    prefix=core_config.ROOT_PATH + "/profile/auto_import",
     tags=["profile"],
     dependencies=[
         Depends(auth_dependencies.validate_access_token),
