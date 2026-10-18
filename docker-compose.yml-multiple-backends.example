@@ -3,7 +3,7 @@ services:
     container_name: endurain
     image: ghcr.io/schms27/endurain:latest
     environment:
-      # Read the Getting Started section on https://docs.endurain.com for all available env variables
+      # Read the Getting Started section on https://schms27.github.io/endurain/ for all available env variables
       - TZ=Europe/Lisbon
       - DB_PASSWORD=changeme
       - SECRET_KEY=~changeme # openssl rand -hex 32

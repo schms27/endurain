@@ -9,7 +9,7 @@ assignees: ''
 ## Checklist
 
 - [ ] I have searched **existing issues** to make sure this bug hasn't already been reported.
-- [ ] I have checked the **documentation** at [https://docs.endurain.com](https://docs.endurain.com) and didn't find a solution.
+- [ ] I have checked the **documentation** at [https://schms27.github.io/endurain/](https://schms27.github.io/endurain/) and didn't find a solution.
 
 ## Description
 

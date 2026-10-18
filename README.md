@@ -1,5 +1,5 @@
 > [!NOTE]
-> **Endurain is on a temporary feature freeze** - The project is not paused. The focus is shifting from new features to strengthening the foundations. More details [here](https://docs.endurain.com/blog/2026/05/23/pausing-new-features-so-endurain-can-keep-growing/)
+> **Endurain is on a temporary feature freeze** - The project is not paused. The focus is shifting from new features to strengthening the foundations. More details [here](https://schms27.github.io/endurain/blog/2026/05/23/pausing-new-features-so-endurain-can-keep-growing/)
 
 <div align="center">
   <img src="logo/brand_logo_dark_theme.png" width="128" height="128">
@@ -32,9 +32,9 @@ Experience Endurain without installation:
 
 ## Table of Contents
 
-- [Endurain documentation](https://docs.endurain.com)
+- [Endurain documentation](https://schms27.github.io/endurain/)
 - [What is Endurain?](#what-is-endurain)
-- [Endurain screenshots](https://docs.endurain.com/gallery/)
+- [Endurain screenshots](https://schms27.github.io/endurain/gallery/)
 - [Sponsors](#sponsors)
 - [Contributing](#contributing)
 - [Help Translate](#help-translate)
@@ -52,7 +52,7 @@ Endurain is a self-hosted fitness tracking service designed to give users full c
 
 To deploy Endurain, a Docker image is available, and a comprehensive example can be found in the "docker-compose.yml.example" file provided. Configuration is facilitated through environment variables, ensuring flexibility and ease of customization.
 
-For more information please see the Endurain's [documentation](https://docs.endurain.com).
+For more information please see the Endurain's [documentation](https://schms27.github.io/endurain/).
 
 ## Sponsors
 

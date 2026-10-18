@@ -1,4 +1,5 @@
 site_name: Endurain documentation
+site_url: https://schms27.github.io/endurain/
 repo_url: https://github.com/schms27/endurain
 theme:
   name: material

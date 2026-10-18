@@ -37,7 +37,7 @@ const yearRange = computed(() => {
         <span aria-hidden="true">•</span>
         <a
           class="inline-flex items-center hover:text-foreground"
-          href="https://docs.endurain.com"
+          href="https://schms27.github.io/endurain/"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="t('footer.documentation')"

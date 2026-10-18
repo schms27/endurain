@@ -777,7 +777,7 @@ def check_deprecated_env_vars() -> None:
     message = (
         f"Deprecated environment variable(s) in use: {', '.join(found)}. "
         "Remove them and restart. See "
-        "https://docs.endurain.com/getting-started/advanced-started/"
+        "https://schms27.github.io/endurain/getting-started/advanced-started/"
         "#supported-environment-variables"
     )
     raise OSError(message)
