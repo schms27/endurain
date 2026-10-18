@@ -187,3 +187,32 @@ def test_exclude_effort(mock_set, client):
     response = client.patch("/segment_efforts/1", json={"is_excluded": True}, headers=AUTH)
     assert response.status_code == 200
     assert mock_set.call_args.args == (1, 1, True, mock_set.call_args.args[3])
+
+
+@patch("segments.segment.router.segment_crud.get_similar_segments")
+def test_similar_segments(mock_similar, client):
+    mock_similar.return_value = [segment_schema.SegmentSummary(**_summary())]
+    response = client.get("/segments/similar?activity_id=5&start_index=40&end_index=240", headers=AUTH)
+    assert response.status_code == 200
+    assert response.json()[0]["id"] == 1
+    assert mock_similar.call_args.args[:4] == (1, 5, 40, 240)
+
+
+def test_similar_segments_rejects_reversed_slice(client):
+    response = client.get("/segments/similar?activity_id=5&start_index=240&end_index=40", headers=AUTH)
+    assert response.status_code == 400
+
+
+@patch("segments.segment.router.segment_efforts_crud.get_segment_leaderboard")
+@patch("segments.segment.router.segment_crud.get_segment_visible_to_user")
+def test_leaderboard(mock_get, mock_board, client):
+    mock_get.return_value = _segment()
+    mock_board.return_value = segment_efforts_schema.SegmentLeaderboard(entries=[], total=0, viewer_entry=None)
+    response = client.get("/segments/1/leaderboard?scope=following&period=this_year&num_records=10", headers=AUTH)
+    assert response.status_code == 200
+    kwargs = mock_board.call_args.kwargs
+    assert kwargs["scope"] == "following" and kwargs["period"] == "this_year" and kwargs["num_records"] == 10
+
+    assert client.get("/segments/1/leaderboard?scope=nobody", headers=AUTH).status_code == 422
+    mock_get.return_value = None
+    assert client.get("/segments/1/leaderboard", headers=AUTH).status_code == 404

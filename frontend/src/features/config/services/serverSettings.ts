@@ -18,6 +18,8 @@ export const DEFAULT_PUBLIC_SERVER_SETTINGS: PublicServerSettings = {
   tileserver_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileserver_attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  segments_enabled: true,
+  segments_public_creation: 'all',
 }
 
 /**

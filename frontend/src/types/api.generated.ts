@@ -4808,6 +4808,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/segments/similar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Similar Segments
+         * @description Existing segments that duplicate a proposed slice of your activity.
+         *
+         *     Args:
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         activity_id: Source activity ID.
+         *         start_index: First lat/lon stream index of the slice.
+         *         end_index: Last lat/lon stream index of the slice (inclusive).
+         *
+         *     Returns:
+         *         Similar segments visible to you, closest length first.
+         *
+         *     Raises:
+         *         HTTPException: 400 when the slice is empty or reversed.
+         */
+        get: operations["read_similar_segments_api_v1_segments_similar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/segments/{segment_id}": {
         parameters: {
             query?: never;
@@ -4891,6 +4925,42 @@ export interface paths {
          *         HTTPException: 404 if the segment is missing or not visible.
          */
         get: operations["read_my_segment_efforts_api_v1_segments__segment_id__efforts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/segments/{segment_id}/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Segment Leaderboard
+         * @description Athletes ranked by their best effort on a segment.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         scope: Rank everyone, the people you follow, or only you.
+         *         period: All time, this year, or the last 90 days.
+         *         page_number: 1-based page number.
+         *         num_records: Page size.
+         *
+         *     Returns:
+         *         The leaderboard page with your own entry.
+         *
+         *     Raises:
+         *         HTTPException: 404 if the segment is missing or not visible.
+         */
+        get: operations["read_segment_leaderboard_api_v1_segments__segment_id__leaderboard_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9478,6 +9548,28 @@ export interface components {
          */
         Language: "ca" | "zh-Hans" | "zh-Hant" | "de" | "fr" | "gl" | "it" | "nl" | "pt-PT" | "sl" | "sv" | "es" | "en" | "pl" | "tr" | "uk" | "ro" | "nb" | "da" | "fi" | "cs" | "el" | "hu" | "bg" | "hr" | "sr" | "sk" | "lt" | "lv" | "et";
         /**
+         * LeaderboardPeriod
+         * @description Time window of a leaderboard.
+         *
+         *     Members:
+         *         ALL: All time.
+         *         THIS_YEAR: Since 1 January of the current year (UTC).
+         *         LAST_90_DAYS: The last 90 days.
+         * @enum {string}
+         */
+        LeaderboardPeriod: "all" | "this_year" | "last_90_days";
+        /**
+         * LeaderboardScope
+         * @description Whose efforts a leaderboard ranks.
+         *
+         *     Members:
+         *         EVERYONE: Every athlete visible to the viewer.
+         *         FOLLOWING: The viewer and the athletes they follow.
+         *         ME: Only the viewer.
+         * @enum {string}
+         */
+        LeaderboardScope: "everyone" | "following" | "me";
+        /**
          * LicenseInfo
          * @description API license metadata.
          *
@@ -10321,6 +10413,8 @@ export interface components {
          *         historical_rank: Rank among the owner's efforts up to this
          *             effort's date (the achievement at the time); None for
          *             excluded efforts.
+         *         pr_elapsed_time: The owner's current PR on this segment in
+         *             seconds (owner only).
          */
         SegmentEffortRead: {
             /** Activity Id */
@@ -10351,6 +10445,8 @@ export interface components {
             max_hr: number | null;
             /** Normalized Power */
             normalized_power: number | null;
+            /** Pr Elapsed Time */
+            pr_elapsed_time?: number | null;
             /** Segment Id */
             segment_id: number;
             /** Segment Name */
@@ -10364,6 +10460,67 @@ export interface components {
             start_time: string;
             /** User Id */
             user_id: number;
+        };
+        /**
+         * SegmentLeaderboard
+         * @description A page of a segment leaderboard.
+         *
+         *     Attributes:
+         *         entries: Ranked entries for the requested page.
+         *         total: Number of ranked athletes.
+         *         viewer_entry: The viewer's own entry, if they have one.
+         */
+        SegmentLeaderboard: {
+            /** Entries */
+            entries: components["schemas"]["SegmentLeaderboardEntry"][];
+            /** Total */
+            total: number;
+            viewer_entry: components["schemas"]["SegmentLeaderboardEntry"] | null;
+        };
+        /**
+         * SegmentLeaderboardEntry
+         * @description One athlete's best visible effort on a segment.
+         *
+         *     Attributes:
+         *         rank: Leaderboard rank (ties share a rank).
+         *         user_id: Athlete user ID.
+         *         user_name: Athlete display name.
+         *         username: Athlete username.
+         *         user_photo_path: Athlete photo path.
+         *         effort_id: Effort ID.
+         *         activity_id: Activity ID.
+         *         start_time: Effort start time; None when the owner hides start
+         *             times.
+         *         elapsed_time: Elapsed seconds.
+         *         average_hr: Average heart rate (bpm), unless hidden.
+         *         average_power: Average power (W), unless hidden.
+         *         average_speed: Average speed (m/s), unless hidden.
+         */
+        SegmentLeaderboardEntry: {
+            /** Activity Id */
+            activity_id: number;
+            /** Average Hr */
+            average_hr: number | null;
+            /** Average Power */
+            average_power: number | null;
+            /** Average Speed */
+            average_speed: number | null;
+            /** Effort Id */
+            effort_id: number;
+            /** Elapsed Time */
+            elapsed_time: number;
+            /** Rank */
+            rank: number;
+            /** Start Time */
+            start_time: string | null;
+            /** User Id */
+            user_id: number;
+            /** User Name */
+            user_name: string | null;
+            /** User Photo Path */
+            user_photo_path: string | null;
+            /** Username */
+            username: string | null;
         };
         /**
          * SegmentRead
@@ -10498,6 +10655,16 @@ export interface components {
             visibility: number;
         };
         /**
+         * SegmentsPublicCreation
+         * @description Who may create public segments.
+         *
+         *     Attributes:
+         *         ALL: Every user.
+         *         ADMINS: Administrators only.
+         * @enum {string}
+         */
+        SegmentsPublicCreation: "all" | "admins";
+        /**
          * ServerSettingsEdit
          * @description Edit schema for server settings updates.
          *
@@ -10565,6 +10732,17 @@ export interface components {
              * @description Allow show user info on public shareable links (true - yes, false - no)
              */
             public_shareable_links_user_info: boolean;
+            /**
+             * Segments Enabled
+             * @description Enable segments and segment matching
+             * @default true
+             */
+            segments_enabled: boolean;
+            /**
+             * @description Who may create public segments (all, admins)
+             * @default all
+             */
+            segments_public_creation: components["schemas"]["SegmentsPublicCreation"];
             /**
              * Signup Enabled
              * @description Allow user sign-up registration (true - yes, false - no)
@@ -10682,6 +10860,17 @@ export interface components {
              */
             public_shareable_links_user_info: boolean;
             /**
+             * Segments Enabled
+             * @description Enable segments and segment matching
+             * @default true
+             */
+            segments_enabled: boolean;
+            /**
+             * @description Who may create public segments (all, admins)
+             * @default all
+             */
+            segments_public_creation: components["schemas"]["SegmentsPublicCreation"];
+            /**
              * Signup Enabled
              * @description Allow user sign-up registration (true - yes, false - no)
              */
@@ -10795,6 +10984,17 @@ export interface components {
              * @description Allow show user info on public shareable links (true - yes, false - no)
              */
             public_shareable_links_user_info: boolean;
+            /**
+             * Segments Enabled
+             * @description Enable segments and segment matching
+             * @default true
+             */
+            segments_enabled: boolean;
+            /**
+             * @description Who may create public segments (all, admins)
+             * @default all
+             */
+            segments_public_creation: components["schemas"]["SegmentsPublicCreation"];
             /**
              * Signup Enabled
              * @description Allow user sign-up registration (true - yes, false - no)
@@ -12114,6 +12314,8 @@ export interface components {
          *         hide_activity_workout_sets_steps: Hide workout
          *             sets/steps.
          *         hide_activity_gear: Hide gear setting.
+         *         hide_from_segment_leaderboards: Hide from other users'
+         *             segment leaderboards.
          *         has_local_password: Whether the account has a local
          *             password (False for SSO-only accounts).
          */
@@ -12243,6 +12445,11 @@ export interface components {
              * @description Hide activity workout sets and steps
              */
             hide_activity_workout_sets_steps?: boolean | null;
+            /**
+             * Hide From Segment Leaderboards
+             * @description Hide from other users' segment leaderboards
+             */
+            hide_from_segment_leaderboards?: boolean | null;
             /**
              * Id
              * @description User ID
@@ -12386,6 +12593,12 @@ export interface components {
              * @default false
              */
             hide_activity_workout_sets_steps: boolean | null;
+            /**
+             * Hide From Segment Leaderboards
+             * @description Hide your efforts from other users' segment leaderboards
+             * @default false
+             */
+            hide_from_segment_leaderboards: boolean | null;
         };
         /**
          * UsersRead
@@ -18166,6 +18379,39 @@ export interface operations {
             };
         };
     };
+    read_similar_segments_api_v1_segments_similar_get: {
+        parameters: {
+            query: {
+                activity_id: number;
+                start_index: number;
+                end_index: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_segment_api_v1_segments__segment_id__get: {
         parameters: {
             query?: never;
@@ -18279,6 +18525,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SegmentEffortRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_segment_leaderboard_api_v1_segments__segment_id__leaderboard_get: {
+        parameters: {
+            query?: {
+                scope?: components["schemas"]["LeaderboardScope"];
+                period?: components["schemas"]["LeaderboardPeriod"];
+                page_number?: number;
+                num_records?: number;
+            };
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentLeaderboard"];
                 };
             };
             /** @description Validation Error */

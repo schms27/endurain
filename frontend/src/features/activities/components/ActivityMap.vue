@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { LocateFixed } from '@lucide/vue'
 
-import type { GeoPoint, MapInstance } from '@/composables/useMapProvider'
+import type { GeoPoint, MapInstance, MapOverlay } from '@/composables/useMapProvider'
 
 import { useMapProvider } from '@/composables/useMapProvider'
 import { useRenderProvidersReady } from '@/providers'
@@ -13,8 +13,10 @@ const props = withDefaults(
     points: GeoPoint[]
     /** Whether the map responds to pan/zoom. */
     interactive?: boolean
+    /** Extra polylines drawn above the track (e.g. a highlighted segment). */
+    overlays?: MapOverlay[]
   }>(),
-  { interactive: true },
+  { interactive: true, overlays: () => [] },
 )
 
 const ready = useRenderProvidersReady()
@@ -37,6 +39,7 @@ function mountMap(): void {
   instance = provider.mount(container.value, {
     track: { points: props.points, ...endpoints(props.points) },
     interactive: props.interactive,
+    overlays: props.overlays,
   })
 }
 
@@ -48,8 +51,8 @@ function recenter(): void {
 onMounted(mountMap)
 watch(ready, mountMap)
 watch(
-  () => props.points,
-  (points) => {
+  () => [props.points, props.overlays] as const,
+  ([points, overlays]) => {
     if (!instance) {
       mountMap()
       return
@@ -57,6 +60,7 @@ watch(
     instance.update({
       track: { points, ...endpoints(points) },
       interactive: props.interactive,
+      overlays,
     })
   },
 )

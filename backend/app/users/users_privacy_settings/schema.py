@@ -52,6 +52,8 @@ class UsersPrivacySettingsBase(BaseModel):
             steps from activities.
         hide_activity_gear: Hide gear information from
             activities.
+        hide_from_segment_leaderboards: Hide your efforts from
+            other users' segment leaderboards.
     """
 
     default_activity_visibility: ActivityVisibility | None = Field(
@@ -72,6 +74,9 @@ class UsersPrivacySettingsBase(BaseModel):
         default=False, description="Hide activity workout sets and steps"
     )
     hide_activity_gear: StrictBool | None = Field(default=False, description="Hide activity gear")
+    hide_from_segment_leaderboards: StrictBool | None = Field(
+        default=False, description="Hide your efforts from other users' segment leaderboards"
+    )
 
     model_config = ConfigDict(
         from_attributes=True,

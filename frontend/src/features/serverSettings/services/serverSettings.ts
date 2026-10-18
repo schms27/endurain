@@ -39,6 +39,8 @@ export function mapServerSettings(dto: ServerSettingsDto): ServerSettings {
     passwordType: dto.password_type,
     passwordLengthRegularUsers: dto.password_length_regular_users,
     passwordLengthAdminUsers: dto.password_length_admin_users,
+    segmentsEnabled: dto.segments_enabled,
+    segmentsPublicCreation: dto.segments_public_creation,
   }
 }
 
@@ -93,6 +95,8 @@ export function toServerSettingsWire(settings: ServerSettings): ServerSettingsEd
     password_type: settings.passwordType,
     password_length_regular_users: settings.passwordLengthRegularUsers,
     password_length_admin_users: settings.passwordLengthAdminUsers,
+    segments_enabled: settings.segmentsEnabled,
+    segments_public_creation: settings.segmentsPublicCreation,
   }
 }
 

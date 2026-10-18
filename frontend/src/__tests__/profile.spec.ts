@@ -173,6 +173,7 @@ describe('profile service requests', () => {
       hideLaps: false,
       hideWorkoutSetsSteps: false,
       hideGear: true,
+      hideFromSegmentLeaderboards: true,
     }
 
     await updatePrivacySettings(privacy)
@@ -185,6 +186,7 @@ describe('profile service requests', () => {
     expect(parsed.default_activity_visibility).toBe('private')
     expect(parsed.hide_activity_location).toBe(true)
     expect(parsed.hide_activity_gear).toBe(true)
+    expect(parsed.hide_from_segment_leaderboards).toBe(true)
     expect(parsed.hide_activity_map).toBe(false)
   })
 

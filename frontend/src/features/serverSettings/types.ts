@@ -22,6 +22,9 @@ export type Currency = Schemas['Currency']
 /** Password policy level, mirrored from the backend enum (`strict` | `length_only`). */
 export type PasswordType = Schemas['PasswordType']
 
+/** Who may create public segments, mirrored from the backend enum (`all` | `admins`). */
+export type SegmentsPublicCreation = Schemas['SegmentsPublicCreation']
+
 /**
  * The clean, camel-cased server-settings model used across the admin zone.
  * Carries every editable column — not just the ones a section renders —
@@ -51,6 +54,8 @@ export type PasswordType = Schemas['PasswordType']
  * @property passwordType - Password policy enforcement level.
  * @property passwordLengthRegularUsers - Minimum password length for regular users.
  * @property passwordLengthAdminUsers - Minimum password length for admin users.
+ * @property segmentsEnabled - Whether segments and segment matching are enabled.
+ * @property segmentsPublicCreation - Who may create public segments.
  */
 export interface ServerSettings {
   id: number
@@ -74,6 +79,8 @@ export interface ServerSettings {
   passwordType: PasswordType
   passwordLengthRegularUsers: number
   passwordLengthAdminUsers: number
+  segmentsEnabled: boolean
+  segmentsPublicCreation: SegmentsPublicCreation
 }
 
 /**

@@ -42,6 +42,8 @@ function makeSettingsDto(overrides: Partial<ServerSettingsDto> = {}): ServerSett
     password_type: 'strict',
     password_length_regular_users: 8,
     password_length_admin_users: 12,
+    segments_enabled: true,
+    segments_public_creation: 'admins',
     ...overrides,
   }
 }
@@ -84,6 +86,8 @@ describe('mapServerSettings', () => {
       passwordType: 'strict',
       passwordLengthRegularUsers: 8,
       passwordLengthAdminUsers: 12,
+      segmentsEnabled: true,
+      segmentsPublicCreation: 'admins',
     })
   })
 

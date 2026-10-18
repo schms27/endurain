@@ -73,6 +73,8 @@ function toFormValues(settings: ServerSettings): ServerSettingsFormValues {
     passwordType: settings.passwordType,
     passwordLengthRegularUsers: settings.passwordLengthRegularUsers,
     passwordLengthAdminUsers: settings.passwordLengthAdminUsers,
+    segmentsEnabled: settings.segmentsEnabled,
+    segmentsPublicCreation: settings.segmentsPublicCreation,
   }
 }
 
@@ -391,6 +393,30 @@ watch(selectedTemplate, (templateId) => {
       <Switch v-model="values.tileserverRegenerateThumbnailsOnChange" :disabled="isSubmitting">
         {{ t('settings.server.maps.regenerateThumbnails') }}
       </Switch>
+    </Card>
+
+    <!-- Segments -->
+    <Card class="flex flex-col gap-3">
+      <h2 class="text-card-heading">{{ t('settings.server.segments.title') }}</h2>
+      <Switch v-model="values.segmentsEnabled" :disabled="isSubmitting">
+        {{ t('settings.server.segments.enabled') }}
+      </Switch>
+      <FormField
+        class="sm:max-w-xs"
+        :label="t('settings.server.segments.publicCreation')"
+        :hint="t('settings.server.segments.publicCreationHint')"
+      >
+        <template #default="{ fieldId }">
+          <Select
+            :id="fieldId"
+            v-model="values.segmentsPublicCreation"
+            :disabled="isSubmitting || !values.segmentsEnabled"
+          >
+            <option value="all">{{ t('settings.server.segments.publicCreationAll') }}</option>
+            <option value="admins">{{ t('settings.server.segments.publicCreationAdmins') }}</option>
+          </Select>
+        </template>
+      </FormField>
     </Card>
 
     <div class="flex justify-begin">

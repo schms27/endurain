@@ -74,6 +74,8 @@ export interface AppConfig {
  * @property num_records_per_page - Page size the server enforces for paginated lists.
  * @property tileserver_url - URL template used by frontend maps to request tiles.
  * @property tileserver_attribution - Attribution shown on frontend maps.
+ * @property segments_enabled - Whether segments are enabled on this instance.
+ * @property segments_public_creation - Who may create public segments.
  */
 export type PublicServerSettings = Pick<
   Schemas['ServerSettingsReadPublic'],
@@ -90,4 +92,6 @@ export type PublicServerSettings = Pick<
   | 'num_records_per_page'
   | 'tileserver_url'
   | 'tileserver_attribution'
+  | 'segments_enabled'
+  | 'segments_public_creation'
 >

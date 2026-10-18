@@ -28,12 +28,27 @@ export interface MapTrack {
   finish?: GeoPoint
 }
 
+/** Semantic overlay style; the provider resolves colours from design tokens. */
+export type MapOverlayStyle = 'highlight' | 'secondary' | 'muted'
+
+/** An extra polyline drawn above the main track (e.g. a segment). */
+export interface MapOverlay {
+  /** Stable identifier, unique within one render. */
+  id: string
+  /** Ordered coordinates of the overlay polyline. */
+  points: GeoPoint[]
+  /** Visual emphasis. Defaults to `'highlight'`. */
+  style?: MapOverlayStyle
+}
+
 /** Options controlling a single map render. */
 export interface MapRenderOptions {
   /** The track to display. */
   track: MapTrack
   /** Whether the map responds to pan/zoom. Defaults to provider preference. */
   interactive?: boolean
+  /** Extra polylines drawn above the track. Optional; providers may ignore it. */
+  overlays?: MapOverlay[]
 }
 
 /** Imperative handle to a mounted map, returned by {@link MapProvider.mount}. */

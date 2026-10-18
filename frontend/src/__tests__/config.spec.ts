@@ -27,6 +27,8 @@ const publicSettings: PublicServerSettings = {
   num_records_per_page: 25,
   tileserver_url: 'https://tiles.test/{z}/{x}/{y}.png',
   tileserver_attribution: '&copy; Test tiles',
+  segments_enabled: true,
+  segments_public_creation: 'all',
 }
 
 describe('mapServerSettingsToAppConfig', () => {

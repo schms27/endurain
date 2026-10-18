@@ -309,6 +309,43 @@ export const queryKeys = {
   },
 
   /**
+   * Segments domain. Creating, editing or deleting a segment and excluding an
+   * effort invalidate `all()`, so segment pages and activity effort cards
+   * refetch together.
+   */
+  segments: {
+    /** Broad prefix; invalidating this cascades to every segments query. */
+    all: () => ['segments'] as const,
+    /**
+     * @param id - Segment identifier.
+     * @returns A detail query key for a single segment.
+     */
+    detail: (id: number) => ['segments', 'detail', id] as const,
+    /**
+     * @param id - Segment identifier.
+     * @param filters - Serializable leaderboard filters (scope, period, page).
+     * @returns A leaderboard query key.
+     */
+    leaderboard: (id: number, filters: Record<string, unknown> = {}) =>
+      ['segments', 'leaderboard', id, filters] as const,
+    /**
+     * @param id - Segment identifier.
+     * @returns The viewer's effort history on a segment.
+     */
+    myEfforts: (id: number) => ['segments', 'myEfforts', id] as const,
+    /**
+     * @param activityId - Activity identifier.
+     * @returns The segment efforts of one activity.
+     */
+    activityEfforts: (activityId: number) => ['segments', 'activityEfforts', activityId] as const,
+    /**
+     * @param filters - Activity id and slice indices.
+     * @returns Existing segments that duplicate a proposed slice.
+     */
+    similar: (filters: Record<string, unknown>) => ['segments', 'similar', filters] as const,
+  },
+
+  /**
    * Users administration domain (admin settings zone). Same shape as
    * {@link queryKeys.notifications}: `all()` is the broad prefix the create/
    * update/delete mutations invalidate on settle so every list, the username

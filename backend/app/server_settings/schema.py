@@ -61,6 +61,19 @@ class PasswordType(Enum):
     LENGTH_ONLY = "length_only"
 
 
+class SegmentsPublicCreation(Enum):
+    """
+    Who may create public segments.
+
+    Attributes:
+        ALL: Every user.
+        ADMINS: Administrators only.
+    """
+
+    ALL = "all"
+    ADMINS = "admins"
+
+
 class ServerSettingsBase(BaseModel):
     """
     Pydantic model for server settings configuration.
@@ -85,6 +98,8 @@ class ServerSettingsBase(BaseModel):
         password_type (PasswordType): Password policy enforcement level (STRICT or LENGTH_ONLY).
         password_length_regular_users (StrictInt): Minimum password length for regular users (8-128, default: 8).
         password_length_admin_users (StrictInt): Minimum password length for admin users (8-128, default: 12).
+        segments_enabled (StrictBool): Enable segments and segment matching.
+        segments_public_creation (SegmentsPublicCreation): Who may create public segments (ALL or ADMINS).
 
     Validators:
         - validate_tileserver_url: Ensures tile server URL is secure, uses proper protocol, contains required placeholders, and blocks dangerous patterns.
@@ -147,6 +162,10 @@ class ServerSettingsBase(BaseModel):
     )
     password_length_admin_users: StrictInt = Field(
         12, ge=8, le=128, description="Minimum password length for admin users"
+    )
+    segments_enabled: StrictBool = Field(True, description="Enable segments and segment matching")
+    segments_public_creation: SegmentsPublicCreation = Field(
+        SegmentsPublicCreation.ALL, description="Who may create public segments (all, admins)"
     )
 
     model_config = ConfigDict(

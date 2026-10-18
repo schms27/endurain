@@ -12,12 +12,14 @@ import 'leaflet/dist/leaflet.css'
 import type {
   GeoPoint,
   MapInstance,
+  MapOverlay,
+  MapOverlayStyle,
   MapProvider,
   MapRenderOptions,
   MapTrack,
 } from '@/composables/useMapProvider'
 
-import { themeColor } from '@/lib/themeColor'
+import { themeColor, type ThemeColorToken } from '@/lib/themeColor'
 
 /** A latitude/longitude pair in Leaflet's expected `[lat, lng]` order. */
 export type LatLngTuple = [number, number]
@@ -45,6 +47,33 @@ const DEFAULT_TRACK_COLOR = themeColor('--color-brand')
 const START_MARKER_COLOR = themeColor('--color-goal')
 /** Finish-marker fill — the `--color-hr` design token (red). */
 const FINISH_MARKER_COLOR = themeColor('--color-hr')
+
+/** Polyline styling for one overlay emphasis. */
+export interface OverlayPathStyle {
+  /** Design token resolved to the stroke colour. */
+  token: ThemeColorToken
+  /** Stroke width in pixels. */
+  weight: number
+  /** Stroke opacity in `[0, 1]`. */
+  opacity: number
+}
+
+/** Overlay emphasis to stroke. Highlights sit visibly above the 4 px track. */
+export const OVERLAY_STYLES: Record<MapOverlayStyle, OverlayPathStyle> = {
+  highlight: { token: '--color-effort', weight: 6, opacity: 0.95 },
+  secondary: { token: '--color-info', weight: 5, opacity: 0.85 },
+  muted: { token: '--color-brand-mid', weight: 4, opacity: 0.5 },
+}
+
+/**
+ * Resolves the stroke for an overlay, defaulting to `'highlight'`.
+ *
+ * @param overlay - The overlay to style.
+ * @returns Its stroke settings.
+ */
+export function overlayStyleOf(overlay: MapOverlay): OverlayPathStyle {
+  return OVERLAY_STYLES[overlay.style ?? 'highlight']
+}
 
 /**
  * Converts seam {@link GeoPoint}s to Leaflet `[lat, lng]` tuples.
@@ -149,7 +178,7 @@ export function createLeafletMapProvider(config: LeafletMapProviderConfig = {}):
         }
       }
 
-      const draw = (track: MapTrack): void => {
+      const draw = (track: MapTrack, extra: readonly MapOverlay[] = []): void => {
         currentTrack = track
         for (const layer of overlays) {
           map.removeLayer(layer)
@@ -159,6 +188,20 @@ export function createLeafletMapProvider(config: LeafletMapProviderConfig = {}):
         const linePoints = toLatLngs(track.points)
         if (linePoints.length > 0) {
           overlays.push(polyline(linePoints, { color: trackColor, weight: 4 }).addTo(map))
+        }
+        for (const overlay of extra) {
+          const overlayPoints = toLatLngs(overlay.points)
+          if (overlayPoints.length < 2) {
+            continue
+          }
+          const style = overlayStyleOf(overlay)
+          overlays.push(
+            polyline(overlayPoints, {
+              color: themeColor(style.token),
+              weight: style.weight,
+              opacity: style.opacity,
+            }).addTo(map),
+          )
         }
         if (track.start) {
           overlays.push(emphasisMarker(track.start, START_MARKER_COLOR).addTo(map))
@@ -170,11 +213,11 @@ export function createLeafletMapProvider(config: LeafletMapProviderConfig = {}):
         fit(track)
       }
 
-      draw(options.track)
+      draw(options.track, options.overlays)
 
       return {
         update(next: MapRenderOptions): void {
-          draw(next.track)
+          draw(next.track, next.overlays)
         },
         recenter(): void {
           fit(currentTrack)

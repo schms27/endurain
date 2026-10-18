@@ -1,0 +1,128 @@
+{
+  "sportGroup": {
+    "run": "Laufen",
+    "ride": "Radfahren",
+    "e_ride": "E-Bike",
+    "foot": "Gehen und Wandern"
+  },
+  "visibility": {
+    "label": "Sichtbarkeit",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "hint": "Öffentliche Segmente werden mit den Aktivitäten aller abgeglichen und haben eine Bestenliste. Private Segmente nur mit deinen eigenen.",
+    "adminsOnly": "Auf diesem Server dürfen nur Administratoren öffentliche Segmente erstellen."
+  },
+  "medal": {
+    "gold": "PB",
+    "silver": "2.",
+    "bronze": "3."
+  },
+  "stats": {
+    "distance": "Distanz",
+    "averageGrade": "Durchschnittliche Steigung",
+    "maximumGrade": "Maximale Steigung",
+    "elevationGain": "Höhenmeter",
+    "efforts": "Leistungen",
+    "athletes": "Sportler"
+  },
+  "efforts": {
+    "title": "Segmente",
+    "create": "Segment erstellen",
+    "empty": "Dieser Aktivität wurde noch kein Segment zugeordnet. Erstelle eines aus einem Abschnitt, den du oft fährst oder läufst.",
+    "unnamed": "Segment",
+    "currentRank": "#{rank} deiner Leistungen",
+    "vsPr": "{delta} zur PB",
+    "exclude": "Diese Leistung ausschließen",
+    "restore": "Diese Leistung wieder einbeziehen",
+    "excluded": "Leistung ausgeschlossen",
+    "restored": "Leistung wieder einbezogen",
+    "excludeError": "Die Leistung konnte nicht aktualisiert werden.",
+    "excludedLabel": "Ausgeschlossen"
+  },
+  "create": {
+    "title": "Segment erstellen",
+    "description": "Wähle den Abschnitt dieser Aktivität, der zum Segment wird. Deine anderen Aktivitäten werden im Hintergrund damit abgeglichen.",
+    "start": "Start",
+    "end": "Ende",
+    "range": "Von {from} bis {to} · {length}",
+    "name": "Name",
+    "descriptionLabel": "Beschreibung",
+    "similar": "Ähnliche Segmente gibt es bereits:",
+    "save": "Segment erstellen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "success": "Segment erstellt. Deine Aktivitäten werden im Hintergrund abgeglichen.",
+    "error": "Das Segment konnte nicht erstellt werden.",
+    "problem": {
+      "tooFewPoints": "Wähle einen längeren Abschnitt: Ein Segment braucht mindestens 10 GPS-Punkte.",
+      "tooShort": "Wähle einen längeren Abschnitt: Dieser ist kürzer als die Mindestlänge.",
+      "tooLong": "Wähle einen kürzeren Abschnitt: Segmente dürfen höchstens 100 km lang sein."
+    }
+  },
+  "edit": {
+    "title": "Segment bearbeiten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "success": "Segment aktualisiert",
+    "error": "Das Segment konnte nicht aktualisiert werden.",
+    "visibilityRematch": "Eine Änderung der Sichtbarkeit gleicht das Segment im Hintergrund neu ab."
+  },
+  "delete": {
+    "title": "Segment löschen?",
+    "body": "„{name}“ und alle zugehörigen Leistungen werden gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "confirm": "Löschen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "success": "Segment gelöscht",
+    "error": "Das Segment konnte nicht gelöscht werden."
+  },
+  "actions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "rematch": "Neu abgleichen",
+    "rematchQueued": "Wird im Hintergrund neu abgeglichen",
+    "rematchError": "Der Neuabgleich konnte nicht gestartet werden."
+  },
+  "detail": {
+    "back": "Zurück",
+    "notFoundTitle": "Segment nicht gefunden",
+    "notFoundDescription": "Dieses Segment existiert nicht oder ist für dich nicht sichtbar.",
+    "elevation": "Höhenprofil",
+    "sourceActivity": "Ursprungsaktivität",
+    "leaderboardTab": "Bestenliste",
+    "myEffortsTab": "Meine Leistungen"
+  },
+  "leaderboard": {
+    "scope": "Sportler",
+    "scopeEveryone": "Alle",
+    "scopeFollowing": "Personen, denen ich folge",
+    "scopeMe": "Nur ich",
+    "period": "Zeitraum",
+    "periodAll": "Gesamt",
+    "periodThisYear": "Dieses Jahr",
+    "periodLast90Days": "Letzte 90 Tage",
+    "rank": "Rang",
+    "athlete": "Sportler",
+    "date": "Datum",
+    "time": "Zeit",
+    "speed": "Pace / Geschwindigkeit",
+    "empty": "Auf diesem Segment gibt es noch keine Leistungen.",
+    "total": "{count} Sportler | {count} Sportler",
+    "unknownAthlete": "Sportler",
+    "viewActivity": "Aktivität ansehen",
+    "errorTitle": "Die Bestenliste konnte nicht geladen werden",
+    "errorDescription": "Beim Laden der Bestenliste ist ein Fehler aufgetreten."
+  },
+  "myEfforts": {
+    "empty": "Du hast auf diesem Segment noch keine Leistungen.",
+    "pr": "Deine PB: {time}",
+    "chartTitle": "Deine Entwicklung",
+    "chartLabel": "Zeit"
+  },
+  "error": {
+    "title": "Das Segment konnte nicht geladen werden",
+    "description": "Beim Laden dieses Segments ist ein Fehler aufgetreten.",
+    "retry": "Erneut versuchen"
+  }
+}

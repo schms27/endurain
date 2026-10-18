@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, type RouteLocationRaw } from 'vue-router'
 import { ChevronLeft, ChevronRight, Trash2, X } from '@lucide/vue'
 
-import type { GeoPoint } from '@/composables/useMapProvider'
+import type { GeoPoint, MapOverlay } from '@/composables/useMapProvider'
 import type { ActivityMedia } from '@/features/activities/types'
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -38,8 +38,16 @@ const props = withDefaults(
     heightClass?: string
     /** Whether the viewer owns the activity (gates the per-photo delete button). */
     isOwner?: boolean
+    /** Extra polylines drawn over the map (e.g. a hovered segment effort). */
+    overlays?: MapOverlay[]
   }>(),
-  { thumbnailUrl: null, thumbnailTo: undefined, heightClass: 'h-72 lg:h-150', isOwner: false },
+  {
+    thumbnailUrl: null,
+    thumbnailTo: undefined,
+    heightClass: 'h-72 lg:h-150',
+    isOwner: false,
+    overlays: () => [],
+  },
 )
 
 const { t } = useI18n()
@@ -165,7 +173,7 @@ async function confirmDelete(): Promise<void> {
         :class="heightClass"
         :aria-hidden="index !== current"
       >
-        <ActivityMap v-if="slide.kind === 'map'" :points="points" />
+        <ActivityMap v-if="slide.kind === 'map'" :points="points" :overlays="overlays" />
         <component
           :is="thumbnailTo ? RouterLink : 'div'"
           v-else-if="slide.kind === 'thumbnail'"
