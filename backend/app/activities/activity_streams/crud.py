@@ -11,7 +11,9 @@ import activities.activity_streams.models as activity_streams_models
 import activities.activity_streams.schema as activity_streams_schema
 import activities.activity_streams.utils as activity_streams_utils
 import core.decorators as core_decorators
+import core.geo as core_geo
 import core.logger as core_logger
+import segments.matching.queue as segments_queue
 import server_settings.utils as server_settings_utils
 import users.users.crud as users_crud
 import users.users.models as users_models
@@ -261,6 +263,39 @@ def get_hr_streams_without_zone_percentages(
     return activity_streams_utils.transform_activity_streams(list(db.scalars(stmt).all()))
 
 
+def get_map_streams_without_activity_bounding_box(
+    db: Session,
+    after_id: int = 0,
+    batch_size: int = 200,
+) -> list[activity_streams_models.ActivityStreams]:
+    """
+    Return map streams whose activity has no bounding box, in batches.
+
+    Args:
+        db: Database session.
+        after_id: Only return streams with an ID above this value.
+        batch_size: Maximum number of streams to return.
+
+    Returns:
+        Map stream ORM instances ordered by ID.
+    """
+    stmt = (
+        select(activity_streams_models.ActivityStreams)
+        .join(
+            activity_models.Activity,
+            activity_models.Activity.id == activity_streams_models.ActivityStreams.activity_id,
+        )
+        .where(
+            activity_streams_models.ActivityStreams.stream_type == activity_streams_constants.STREAM_TYPE_MAP,
+            activity_models.Activity.bbox_min_lat.is_(None),
+            activity_streams_models.ActivityStreams.id > after_id,
+        )
+        .order_by(activity_streams_models.ActivityStreams.id)
+        .limit(batch_size)
+    )
+    return list(db.scalars(stmt).all())
+
+
 def backfill_zone_percentages_for_missing_hr_streams(
     computed_streams: list[dict[str, int | dict]],
     db: Session,
@@ -403,7 +438,10 @@ async def create_activity_streams(
         return
 
     streams: list[activity_streams_models.ActivityStreams] = []
+    bbox: core_geo.BoundingBox | None = None
     for stream in activity_streams:
+        if stream.stream_type == activity_streams_constants.STREAM_TYPE_MAP:
+            bbox = activity_streams_utils.bounding_box_from_lat_lon_waypoints(stream.stream_waypoints)
         zone_percentages: dict | None = None
         if stream.stream_type == activity_streams_constants.STREAM_TYPE_HR:
             try:
@@ -430,4 +468,10 @@ async def create_activity_streams(
 
     if streams:
         db.add_all(streams)
+        if bbox is not None and activity.id is not None:
+            # Same transaction as the streams: the bounding box lets
+            # segment matching find this activity, and the queue row
+            # makes the matcher pick it up in the background.
+            activity_crud.set_activity_bounding_box(activity.id, bbox, db, commit=False)
+            segments_queue.enqueue_activity(activity.id, db, commit=False)
         db.commit()

@@ -10,6 +10,7 @@ import activities.activity.schema as activity_schema
 import activities.activity_streams.constants as activity_streams_constants
 import activities.activity_streams.models as activity_streams_models
 import activities.activity_streams.schema as activity_streams_schema
+import core.geo as core_geo
 import users.users.schema as users_schema
 
 # Map stream type to activity hide attribute
@@ -92,6 +93,32 @@ def transform_activity_streams(
     if isinstance(activity_streams, list):
         return [activity_streams_schema.ActivityStreamsRead.model_validate(stream) for stream in activity_streams]
     return activity_streams_schema.ActivityStreamsRead.model_validate(activity_streams)
+
+
+def bounding_box_from_lat_lon_waypoints(
+    waypoints: list[dict] | None,
+) -> core_geo.BoundingBox | None:
+    """
+    Compute the bounding box of a lat/lon stream.
+
+    Args:
+        waypoints: Map stream waypoints (dicts with ``lat``/``lon``).
+
+    Returns:
+        The bounding box, or None if no waypoint has coordinates.
+    """
+    if not waypoints:
+        return None
+    lats: list[float] = []
+    lons: list[float] = []
+    for waypoint in waypoints:
+        lat = waypoint.get("lat") if isinstance(waypoint, dict) else None
+        lon = waypoint.get("lon") if isinstance(waypoint, dict) else None
+        if lat is None or lon is None:
+            continue
+        lats.append(float(lat))
+        lons.append(float(lon))
+    return core_geo.bounding_box(lats, lons)
 
 
 def resolve_max_heart_rate(user: users_schema.UsersRead) -> int | None:

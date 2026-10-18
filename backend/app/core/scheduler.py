@@ -10,6 +10,7 @@ import core.logger as core_logger
 import core.network as core_network
 import garmin.activity_utils as garmin_activity_utils
 import garmin.health_utils as garmin_health_utils
+import segments.matching.jobs as segments_jobs
 import strava.activity_utils as strava_activity_utils
 import strava.utils as strava_utils
 
@@ -126,6 +127,14 @@ def start_scheduler() -> None:
         60,
         [],
         "generate thumbnails for activities missing one",
+    )
+
+    add_scheduler_job(
+        segments_jobs.process_segment_match_queue,
+        "interval",
+        1,
+        [],
+        "process the segment match queue",
     )
 
     add_scheduler_job(

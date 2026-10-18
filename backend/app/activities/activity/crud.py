@@ -27,10 +27,12 @@ from sqlalchemy.orm import Session
 import activities.activity.models as activities_models
 import activities.activity.schema as activities_schema
 import activities.activity.utils as activities_utils
+import core.geo as core_geo
 import core.logger as core_logger
 import core.sanitization as core_sanitization
 import followers.models as followers_models
 import notifications.utils as notifications_utils
+import segments.matching.queue as segments_queue
 import server_settings.utils as server_settings_utils
 import websocket.manager as websocket_manager
 
@@ -1208,6 +1210,45 @@ def set_activity_thumbnail_path(
         raise _internal_server_error(err, "set_activity_thumbnail_path") from err
 
 
+def set_activity_bounding_box(
+    activity_id: int,
+    bbox: core_geo.BoundingBox | None,
+    db: Session,
+    *,
+    commit: bool = True,
+) -> None:
+    """Set the GPS track bounding box for an activity.
+
+    Args:
+        activity_id: Target activity ID.
+        bbox: Bounding box, or None to clear it.
+        db: Database session.
+        commit: Whether to commit the change.
+
+    Returns:
+        None
+
+    Raises:
+        HTTPException: 500 on database error.
+    """
+    try:
+        db.execute(
+            sa_update(activities_models.Activity)
+            .where(activities_models.Activity.id == activity_id)
+            .values(
+                bbox_min_lat=bbox.min_lat if bbox else None,
+                bbox_min_lon=bbox.min_lon if bbox else None,
+                bbox_max_lat=bbox.max_lat if bbox else None,
+                bbox_max_lon=bbox.max_lon if bbox else None,
+            )
+        )
+        if commit:
+            db.commit()
+    except SQLAlchemyError as err:
+        db.rollback()
+        raise _internal_server_error(err, "set_activity_bounding_box") from err
+
+
 def clear_all_activity_thumbnail_paths(db: Session) -> None:
     """Set ``map_thumbnail_path`` to NULL on every activity.
 
@@ -1325,8 +1366,18 @@ def edit_activity(
         # ``id`` is the primary key — never overwrite it
         activity_data.pop("id", None)
 
+        # Segment efforts depend on the sport and on the activity being
+        # visible (not a duplicate pending review): rematch on change.
+        rematch_segments = any(
+            key in activity_data and activity_data[key] != getattr(db_activity, key)
+            for key in ("activity_type", "is_hidden")
+        )
+
         for key, value in activity_data.items():
             setattr(db_activity, key, value)
+
+        if rematch_segments and db_activity.bbox_min_lat is not None:
+            segments_queue.enqueue_activity(db_activity.id, db, commit=False)
 
         db.commit()
         db.refresh(db_activity)
