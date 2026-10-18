@@ -26,7 +26,13 @@ import type {
 import { apiFetch } from '@/services/http'
 
 /** The scopes an API key can be granted (mirrors the backend allow-list). */
-export const API_KEY_SCOPES = ['activities:upload'] as const
+export const API_KEY_SCOPES = [
+  'activities:upload',
+  'activities:read',
+  'gears:read',
+  'health:read',
+  'profile',
+] as const
 
 /** Maps a raw MFA-status payload to the clean model. */
 export function mapMfaStatus(dto: MfaStatusDto): MfaStatus {

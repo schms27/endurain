@@ -4,9 +4,9 @@ Endurain supports integration with other apps through a comprehensive OAuth 2.1 
 
 ## API Requirements
 
-- **Client Type Header:** Most protected JWT requests must include an `X-Client-Type` header with either `web` or `mobile` as the value. Authentication, public, browser-redirect, API-key, and activity-upload unified-auth flows follow the endpoint-specific requirements below.
+- **Client Type Header:** Most protected JWT requests must include an `X-Client-Type` header with either `web` or `mobile` as the value. Authentication, public, browser-redirect, and API-key (unified-auth) flows follow the endpoint-specific requirements below.
 - **OAuth/PKCE Client Type Binding:** For `/public/idp/login/{idp_slug}` and password PKCE login, the backend records a `client_type` on the PKCE/OAuth state. During `/public/idp/session/{session_id}/tokens`, that stored value controls the response shape. The token-exchange `X-Client-Type` header is optional, but if provided it must match the stored value; otherwise the exchange returns `400` with `client_type does not match the OAuth state`.
-- **Authorization:** Most protected JWT requests must include an `Authorization: Bearer <access token>` header with a valid access token. Login, MFA verification, OAuth initiation/callback/token exchange, password reset, sign-up, and activity uploads authenticated with an API key are exceptions.
+- **Authorization:** Most protected JWT requests must include an `Authorization: Bearer <access token>` header with a valid access token. Login, MFA verification, OAuth initiation/callback/token exchange, password reset, sign-up, and requests to API-key-enabled endpoints authenticated with an API key are exceptions.
 - **CSRF Protection (Web Only):** State-changing protected web requests (`POST`, `PUT`, `DELETE`, `PATCH`) must include an `X-CSRF-Token` header. This custom header requirement prevents simple cross-site form submissions and is combined with short-lived in-memory access tokens, `SameSite=Strict` refresh cookies, and CORS controls. `/auth/refresh` supports a bootstrap refresh without this header after page reload; if the header is provided and the session has a stored CSRF binding, the token value must be valid.
 
 !!! note "API Key Authentication"
@@ -204,6 +204,7 @@ Require JWT authentication with the standard `X-Client-Type` requirement; state-
 | What | Url | Expected Information |
 | ---- | --- | -------------------- |
 | **Activity Upload** | `/activities/create/upload` | .gpx, .tcx, .gz or .fit file. Accepts JWT **or** API key (`X-API-Key` header, or `?api_key=` query param only when `ALLOW_API_KEY_QUERY_PARAM=true`) with `activities:upload` scope. This unified-auth endpoint does not require `X-Client-Type` |
+| **Weekly Summary** | `/activities_summaries/week` | Accepts JWT **or** API key with `activities:read` scope. See [Endpoints That Accept API Keys](#endpoints-that-accept-api-keys) for all read endpoints |
 | **Set Weight** | `/health/weight` | JSON `{'weight': <number>, 'created_at': 'yyyy-MM-dd'}` |
 
 ## Step-up Authentication
@@ -515,13 +516,20 @@ The raw key is shown **once** at creation time and is never stored by the server
 
 ### Scopes
 
-API keys are granted one or more API-key scopes at creation time. Currently only `activities:upload` is accepted; JWT-only scopes such as `profile`, `activities:read`, or `users:write` cannot be granted to API keys.
+API keys are granted one or more API-key scopes at creation time. Only the scopes below are accepted; write and admin scopes such as `activities:write`, `health:write`, or `users:write` cannot be granted to API keys.
 
-The key-management API rejects any requested scope outside the API-key allow-list. This keeps long-lived API keys limited to the endpoint that currently supports API-key authentication.
+The key-management API rejects any requested scope outside the API-key allow-list. Every allowed scope is part of the regular-user scope set, so a key never exceeds its owner's privileges. A scope only takes effect on the endpoints listed in [Endpoints That Accept API Keys](#endpoints-that-accept-api-keys); all other endpoints remain JWT-only regardless of the scopes a key holds.
 
 | Scope | Description |
 | ----- | ----------- |
 | `activities:upload` | Upload activity files (.gpx, .tcx, .fit, .gz) |
+| `activities:read` | Read activity statistics, summaries, and activity lists |
+| `gears:read` | Read the gear list |
+| `health:read` | Read sleep, steps, and weight records and health targets |
+| `profile` | Read the authenticated user's profile (`GET /profile` only) |
+
+!!! tip "Read-only integrations"
+    Home automation and dashboard integrations (e.g. Home Assistant) should create a key with only the read scopes they need and no `activities:upload`.
 
 ### How to Authenticate with an API Key
 
@@ -558,8 +566,20 @@ If both the `X-API-Key` header and the `?api_key=` query parameter are present, 
 | Method | Endpoint | Required Scope | Description |
 | ------ | -------- | -------------- | ----------- |
 | `POST` | `/activities/create/upload` | `activities:upload` | Upload a .gpx, .tcx, .fit, or .gz activity file |
+| `GET` | `/activities/user/{user_id}/thisweek/stats` | `activities:read` | Aggregated stats for the current week |
+| `GET` | `/activities/user/{user_id}/thismonth/stats` | `activities:read` | Aggregated stats for the current month |
+| `GET` | `/activities/user/{user_id}/page_number/{page_number}/num_records/{num_records}` | `activities:read` | Paginated activity list (supports the same filters and sorting as the web UI) |
+| `GET` | `/activities_summaries/{view_type}` | `activities:read` | Week, month, year, or lifetime summary |
+| `GET` | `/gears` | `gears:read` | Paginated gear list |
+| `GET` | `/health/sleep` | `health:read` | Paginated sleep records |
+| `GET` | `/health/steps` | `health:read` | Paginated steps records |
+| `GET` | `/health/weight` | `health:read` | Paginated weight records |
+| `GET` | `/health/targets` | `health:read` | Health targets |
+| `GET` | `/profile` | `profile` | Authenticated user's profile (units, first day of week, user ID) |
 
-The upload endpoint also accepts JWT authentication through the same unified-auth dependency. JWT upload requests still require `Authorization: Bearer <access token>` and the `activities:upload` scope, but this endpoint does not require `X-Client-Type`.
+These endpoints also accept JWT authentication through the same unified-auth dependency. JWT requests still require `Authorization: Bearer <access token>` and the listed scope, but these endpoints do not require `X-Client-Type`.
+
+The set of API-key-enabled endpoints is pinned by `backend/tests/core/test_routes_api_key_access.py`; exposing another endpoint to API keys requires updating that test.
 
 ### Managing API Keys
 
@@ -592,7 +612,7 @@ Content-Type: application/json
 | Field | Required | Description |
 | ----- | -------- | ----------- |
 | `name` | Yes | Human-readable label (max 100 characters) |
-| `scopes` | Yes | Array of API-key scopes to grant. Currently only `activities:upload` is accepted |
+| `scopes` | Yes | Array of API-key scopes to grant. See [Scopes](#scopes) for the accepted values |
 | `expires_at` | No | ISO 8601 expiry datetime. Omit or `null` for no expiry |
 | `current_password` | Conditionally | Required for accounts with a local password. Omit for SSO-only accounts |
 | `mfa_code` | Conditionally | Required when MFA is enabled on the account |

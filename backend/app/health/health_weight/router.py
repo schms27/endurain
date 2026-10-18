@@ -14,20 +14,24 @@ import health.health_weight.schema as health_weight_schema
 # Define the API router
 router = APIRouter()
 
+# Separate router for read-only endpoints that support
+# both JWT and API key authentication
+api_read_router = APIRouter()
 
-@router.get(
+
+@api_read_router.get(
     "",
     response_model=health_weight_schema.HealthWeightListResponse,
     status_code=status.HTTP_200_OK,
 )
 def read_health_weight_all_pagination(
-    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_scopes, scopes=["health:read"])],
+    _check_scopes: Annotated[Callable, Security(auth_dependencies.check_auth_scopes, scopes=["health:read"])],
     _validate_pagination_values_on_query: Annotated[
         Callable, Depends(core_dependencies.validate_pagination_values_on_query)
     ],
     token_user_id: Annotated[
         int,
-        Depends(auth_dependencies.get_sub_from_access_token),
+        Depends(auth_dependencies.get_user_id_from_auth),
     ],
     db: Annotated[
         Session,

@@ -129,27 +129,25 @@ def _include_router_if_exists(app: FastAPI, dotted: str):
         - If the module does not exist or does not have a 'router' attribute, the function silently ignores the error.
         - This is useful for conditionally including routers in a modular FastAPI project.
         - For health_weight router, adds /health_weight prefix to match expected test URLs
+        - A module's ``api_read_router`` (JWT or API key endpoints) is included
+          with the same prefix as its ``router``
     """
+    prefixes = {
+        "health.health_sleep.router": "/health_sleep",
+        "health.health_steps.router": "/health_steps",
+        "health.health_targets.router": "/health/targets",
+        "health.health_weight.router": "/health_weight",
+        "users.users_goals.router": "/user_goals",
+        "auth.api_keys.router": "/api_keys",
+        "server_settings.public_router": "/server_settings/public",
+    }
     with contextlib.suppress(Exception):
         mod = import_module(dotted)
-        router = getattr(mod, "router", None)
-        if router is not None:
-            if dotted == "health.health_sleep.router":
-                app.include_router(router, prefix="/health_sleep")
-            elif dotted == "health.health_steps.router":
-                app.include_router(router, prefix="/health_steps")
-            elif dotted == "health.health_targets.router":
-                app.include_router(router, prefix="/health/targets")
-            elif dotted == "health.health_weight.router":
-                app.include_router(router, prefix="/health_weight")
-            elif dotted == "users.users_goals.router":
-                app.include_router(router, prefix="/user_goals")
-            elif dotted == "auth.api_keys.router":
-                app.include_router(router, prefix="/api_keys")
-            elif dotted == "server_settings.public_router":
-                app.include_router(router, prefix="/server_settings/public")
-            else:
-                app.include_router(router)
+        prefix = prefixes.get(dotted, "")
+        for attr in ("router", "api_read_router"):
+            router = getattr(mod, attr, None)
+            if router is not None:
+                app.include_router(router, prefix=prefix)
 
 
 def _override_if_exists(app: FastAPI, dotted: str, attr: str, override_callable):

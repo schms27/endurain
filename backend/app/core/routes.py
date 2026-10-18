@@ -12,6 +12,7 @@ import activities.activity_laps.router as activity_laps_router
 import activities.activity_media.router as activity_media_router
 import activities.activity_sets.public_router as activity_sets_public_router
 import activities.activity_sets.router as activity_sets_router
+import activities.activity_streaks.router as activity_streaks_router
 import activities.activity_streams.router as activity_streams_router
 import activities.activity_summaries.router as activity_summaries_router
 import auth.api_keys.router as auth_api_keys_router
@@ -49,6 +50,7 @@ import users.users_default_gear.router as user_default_gear_router
 import users.users_goals.router as user_goals_router
 import users.users_profile.browser_redirect_router as profile_browser_redirect_router
 import users.users_profile.router as profile_router
+import users.users_streak_settings.router as user_streak_settings_router
 import websocket.router as websocket_router
 from activities.activity_exercise_titles import (
     public_router as activity_exercise_titles_public_router,
@@ -80,6 +82,12 @@ router.include_router(
 )
 router.include_router(
     activities_router.api_upload_router,
+    prefix=core_config.ROOT_PATH + "/activities",
+    tags=["activities"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
+)
+router.include_router(
+    activities_router.api_read_router,
     prefix=core_config.ROOT_PATH + "/activities",
     tags=["activities"],
     dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
@@ -121,10 +129,22 @@ router.include_router(
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
+    activity_streaks_router.router,
+    prefix=core_config.ROOT_PATH + "/activities_streaks",
+    tags=["streaks"],
+    dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
     activity_summaries_router.router,
     prefix=core_config.ROOT_PATH + "/activities_summaries",
     tags=["summaries"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    activity_summaries_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/activities_summaries",
+    tags=["summaries"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
 )
 router.include_router(
     routes_router.router,
@@ -177,6 +197,12 @@ router.include_router(
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
+    gears_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/gears",
+    tags=["gears"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
+)
+router.include_router(
     health_router.router,
     prefix=core_config.ROOT_PATH + "/health",
     tags=["health"],
@@ -189,16 +215,34 @@ router.include_router(
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
+    health_sleep_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/health/sleep",
+    tags=["health_sleep"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
+)
+router.include_router(
     health_weight_router.router,
     prefix=core_config.ROOT_PATH + "/health/weight",
     tags=["health_weight"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(
+    health_weight_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/health/weight",
+    tags=["health_weight"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
+)
+router.include_router(
     health_steps_router.router,
     prefix=core_config.ROOT_PATH + "/health/steps",
     tags=["health_steps"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    health_steps_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/health/steps",
+    tags=["health_steps"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
 )
 router.include_router(
     health_fasting_router.router,
@@ -217,6 +261,12 @@ router.include_router(
     prefix=core_config.ROOT_PATH + "/health/targets",
     tags=["health_targets"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    health_targets_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/health/targets",
+    tags=["health_targets"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
 )
 router.include_router(
     health_water_router.router,
@@ -258,6 +308,12 @@ router.include_router(
         Depends(auth_dependencies.validate_access_token),
         Security(auth_dependencies.check_scopes, scopes=["profile"]),
     ],
+)
+router.include_router(
+    profile_router.api_read_router,
+    prefix=core_config.ROOT_PATH + "/profile",
+    tags=["profile"],
+    dependencies=[Depends(auth_dependencies.validate_access_token_or_api_key)],
 )
 router.include_router(
     server_settings_router.router,
@@ -302,6 +358,15 @@ router.include_router(
 router.include_router(
     user_goals_router.router,
     prefix=core_config.ROOT_PATH + "/profile/goals",
+    tags=["profile"],
+    dependencies=[
+        Depends(auth_dependencies.validate_access_token),
+        Security(auth_dependencies.check_scopes, scopes=["profile"]),
+    ],
+)
+router.include_router(
+    user_streak_settings_router.router,
+    prefix=core_config.ROOT_PATH + "/profile/streak_settings",
     tags=["profile"],
     dependencies=[
         Depends(auth_dependencies.validate_access_token),

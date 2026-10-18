@@ -85,9 +85,15 @@ def profile_app(
         profile_router.router,
         prefix=core_config.ROOT_PATH + "/profile",
     )
+    app.include_router(
+        profile_router.api_read_router,
+        prefix=core_config.ROOT_PATH + "/profile",
+    )
 
     app.dependency_overrides[core_database.get_db] = lambda: local_mock_db
     app.dependency_overrides[auth_dependencies.get_sub_from_access_token] = lambda: 1
+    app.dependency_overrides[auth_dependencies.get_user_id_from_auth] = lambda: 1
+    app.dependency_overrides[auth_dependencies.check_auth_scopes] = lambda: None
     app.dependency_overrides[auth_dependencies.get_sid_from_access_token] = lambda: "session-1"
     app.dependency_overrides[auth_identity_service.get_identity_service] = lambda: mock_identity_service
     app.dependency_overrides[auth_mfa_setup_store.get_mfa_secret_store] = lambda: fake_mfa_secret_store

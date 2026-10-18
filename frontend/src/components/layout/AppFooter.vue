@@ -65,7 +65,7 @@ const yearRange = computed(() => {
           Discord
         </a>
         <span aria-hidden="true">•</span>
-        <span>v0.100.0</span>
+        <span>v0.101.0</span>
       </p>
 
       <p

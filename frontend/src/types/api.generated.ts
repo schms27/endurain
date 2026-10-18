@@ -667,6 +667,69 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/activities_streaks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read My Weekly Streak
+         * @description Read the authenticated user's weekly streak.
+         *
+         *     Args:
+         *         _check_scopes: Dependency that checks required scopes.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The weekly streak response.
+         */
+        get: operations["read_my_weekly_streak_api_v1_activities_streaks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/activities_streaks/user/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read User Weekly Streak
+         * @description Read another user's weekly streak for their profile page.
+         *
+         *     The streak is only returned when the profile owner enabled
+         *     "show on profile" in their streak settings, or when the
+         *     viewer is the owner. Otherwise ``null`` is returned so the
+         *     profile simply hides the streak card.
+         *
+         *     Args:
+         *         user_id: Profile owner's user ID.
+         *         _validate_id: User ID validation dependency.
+         *         _check_scopes: Dependency that checks required scopes.
+         *         token_user_id: Authenticated viewer's user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The weekly streak response, or None if not shared.
+         */
+        get: operations["read_user_weekly_streak_api_v1_activities_streaks_user__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/activities_streams/activity_id/{activity_id}/all": {
         parameters: {
             query?: never;
@@ -2998,7 +3061,7 @@ export interface paths {
          * @description Retrieve authenticated user profile with integrations.
          *
          *     Args:
-         *         token_user_id: User ID from access token.
+         *         token_user_id: User ID from access token or API key.
          *         db: Database session.
          *
          *     Returns:
@@ -4082,6 +4145,45 @@ export interface paths {
          *         None.
          */
         delete: operations["delete_profile_session_api_v1_profile_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profile/streak_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Streak Settings
+         * @description Read the authenticated user's weekly streak settings.
+         *
+         *     Args:
+         *         token_user_id: User ID from access token.
+         *         db: Database session dependency.
+         *
+         *     Returns:
+         *         The stored settings, or defaults when never saved.
+         */
+        get: operations["read_streak_settings_api_v1_profile_streak_settings_get"];
+        /**
+         * Update Streak Settings
+         * @description Create or replace the authenticated user's streak settings.
+         *
+         *     Args:
+         *         settings: New settings values.
+         *         token_user_id: User ID from access token.
+         *         db: Database session dependency.
+         *
+         *     Returns:
+         *         The stored settings.
+         */
+        put: operations["update_streak_settings_api_v1_profile_streak_settings_put"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -11559,6 +11661,33 @@ export interface components {
             client_secret: string | null;
         };
         /**
+         * StreakWeek
+         * @description Activity count for one week of the streak history.
+         *
+         *     Attributes:
+         *         week_start: First day of the week.
+         *         activity_count: Counted activities in the week.
+         *         met: Whether the weekly target was reached.
+         */
+        StreakWeek: {
+            /**
+             * Activity Count
+             * @description Counted activities in the week
+             */
+            activity_count: number;
+            /**
+             * Met
+             * @description Whether the weekly target was reached
+             */
+            met: boolean;
+            /**
+             * Week Start
+             * Format: date
+             * @description First day of the week
+             */
+            week_start: string;
+        };
+        /**
          * TileMapsTemplate
          * @description Schema representing available tile map templates.
          *
@@ -11851,7 +11980,7 @@ export interface components {
          *
          *     Attributes:
          *         name: User-friendly label for the key.
-         *         scopes: List containing the supported API key scope.
+         *         scopes: List of supported API key scopes.
          *         expires_at: Optional expiration datetime.
          *             None means the key never expires.
          *         current_password: Caller's existing password
@@ -13264,6 +13393,60 @@ export interface components {
              */
             username: string;
         };
+        /**
+         * UsersStreakSettingsRead
+         * @description Streak settings as returned by the API.
+         *
+         *     Attributes:
+         *         user_id: Owner of the settings.
+         */
+        UsersStreakSettingsRead: {
+            /**
+             * Activity Types
+             * @description Activity type IDs counted for the streak (null = all types)
+             */
+            activity_types?: number[] | null;
+            /**
+             * Min Activities Per Week
+             * @description Activities needed in a week to keep the streak
+             * @default 1
+             */
+            min_activities_per_week: number;
+            /**
+             * Show On Profile
+             * @description Show the streak to other users on the profile
+             * @default false
+             */
+            show_on_profile: boolean;
+            /**
+             * User Id
+             * @description User ID that owns the settings
+             */
+            user_id: number;
+        };
+        /**
+         * UsersStreakSettingsUpdate
+         * @description Request body for replacing the user's streak settings.
+         */
+        UsersStreakSettingsUpdate: {
+            /**
+             * Activity Types
+             * @description Activity type IDs counted for the streak (null = all types)
+             */
+            activity_types?: number[] | null;
+            /**
+             * Min Activities Per Week
+             * @description Activities needed in a week to keep the streak
+             * @default 1
+             */
+            min_activities_per_week: number;
+            /**
+             * Show On Profile
+             * @description Show the streak to other users on the profile
+             * @default false
+             */
+            show_on_profile: boolean;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -13335,6 +13518,57 @@ export interface components {
              * @description Calendar week number within the month
              */
             week_number: number;
+        };
+        /**
+         * WeeklyStreakResponse
+         * @description Weekly streak status for a user.
+         *
+         *     Attributes:
+         *         current_streak: Consecutive weeks meeting the target,
+         *             ending with the current week if it is already met,
+         *             otherwise with the previous week.
+         *         current_streak_start: First week of the current streak.
+         *         longest_streak: Longest run of consecutive weeks ever.
+         *         longest_streak_start: First week of the longest run.
+         *         longest_streak_end: Last week of the longest run.
+         *         current_week_start: First day of the current week.
+         *         current_week_count: Counted activities this week.
+         *         current_week_met: Whether this week's target is met.
+         *         at_risk: True when a streak is running but the current
+         *             week's target is not met yet.
+         *         min_activities_per_week: Weekly target in effect.
+         *         activity_types: Activity type IDs counted (None = all).
+         *         recent_weeks: Most recent weeks, oldest first, ending
+         *             with the current week.
+         */
+        WeeklyStreakResponse: {
+            /** Activity Types */
+            activity_types?: number[] | null;
+            /** At Risk */
+            at_risk: boolean;
+            /** Current Streak */
+            current_streak: number;
+            /** Current Streak Start */
+            current_streak_start?: string | null;
+            /** Current Week Count */
+            current_week_count: number;
+            /** Current Week Met */
+            current_week_met: boolean;
+            /**
+             * Current Week Start
+             * Format: date
+             */
+            current_week_start: string;
+            /** Longest Streak */
+            longest_streak: number;
+            /** Longest Streak End */
+            longest_streak_end?: string | null;
+            /** Longest Streak Start */
+            longest_streak_start?: string | null;
+            /** Min Activities Per Week */
+            min_activities_per_week: number;
+            /** Recent Weeks */
+            recent_weeks: components["schemas"]["StreakWeek"][];
         };
         /**
          * WeeklySummaryResponse
@@ -14070,6 +14304,7 @@ export interface operations {
                 name_search?: string | null;
                 sort_by?: string | null;
                 sort_order?: string | null;
+                api_key?: string | null;
                 activity_type?: number | null;
             };
             header?: never;
@@ -14135,7 +14370,9 @@ export interface operations {
     };
     read_activities_user_activities_this_month_stats_api_v1_activities_user__user_id__thismonth_stats_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path: {
                 user_id: number;
@@ -14166,7 +14403,9 @@ export interface operations {
     };
     read_activities_user_activities_this_week_stats_api_v1_activities_user__user_id__thisweek_stats_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path: {
                 user_id: number;
@@ -14501,6 +14740,57 @@ export interface operations {
             };
         };
     };
+    read_my_weekly_streak_api_v1_activities_streaks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyStreakResponse"];
+                };
+            };
+        };
+    };
+    read_user_weekly_streak_api_v1_activities_streaks_user__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyStreakResponse"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_activities_streams_for_activity_all_api_v1_activities_streams_activity_id__activity_id__all_get: {
         parameters: {
             query?: never;
@@ -14573,6 +14863,7 @@ export interface operations {
                 year?: number | null;
                 /** @description Filter summary by activity type name. */
                 type?: string | null;
+                api_key?: string | null;
             };
             header?: never;
             path: {
@@ -15434,6 +15725,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by inactive status */
                 show_inactive?: boolean | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16088,6 +16380,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16239,6 +16532,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -16363,7 +16657,9 @@ export interface operations {
     };
     read_health_targets_all_api_v1_health_targets_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -16377,6 +16673,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthTargetsRead"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -16554,6 +16859,7 @@ export interface operations {
                 num_records?: number | null;
                 /** @description Filter by goal interval */
                 interval?: components["schemas"]["health__constants__Interval"] | null;
+                api_key?: string | null;
             };
             header?: never;
             path?: never;
@@ -17011,7 +17317,9 @@ export interface operations {
     };
     read_users_me_api_v1_profile_get: {
         parameters: {
-            query?: never;
+            query?: {
+                api_key?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -17025,6 +17333,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsersMe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -18002,6 +18319,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_streak_settings_api_v1_profile_streak_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsersStreakSettingsRead"];
+                };
+            };
+        };
+    };
+    update_streak_settings_api_v1_profile_streak_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsersStreakSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsersStreakSettingsRead"];
+                };
             };
             /** @description Validation Error */
             422: {
