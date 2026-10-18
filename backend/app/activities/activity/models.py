@@ -9,7 +9,9 @@ from sqlalchemy import (
     JSON,
     BigInteger,
     DateTime,
+    Float,
     ForeignKey,
+    Index,
     String,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -87,6 +89,11 @@ class Activity(Base):
         tracker_manufacturer: Device manufacturer.
         tracker_model: Device model.
         map_thumbnail_path: Path to the static map thumbnail.
+        total_cycles: Total cycles (e.g., pedal strokes).
+        bbox_min_lat: GPS bounding box southern edge.
+        bbox_min_lon: GPS bounding box western edge.
+        bbox_max_lat: GPS bounding box northern edge.
+        bbox_max_lon: GPS bounding box eastern edge.
         users: Relationship to the owner user.
         gear: Relationship to the associated gear.
         activity_laps: Related activity laps.
@@ -97,6 +104,14 @@ class Activity(Base):
     """
 
     __tablename__ = "activities"
+    __table_args__ = (
+        Index(
+            "ix_activities_activity_type_bbox",
+            "activity_type",
+            "bbox_min_lat",
+            "bbox_max_lat",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         primary_key=True,
@@ -350,6 +365,26 @@ class Activity(Base):
     total_cycles: Mapped[int | None] = mapped_column(
         nullable=True,
         comment=("Total number of cycles (e.g., pedal strokes) recorded"),
+    )
+    bbox_min_lat: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Southern edge of the GPS track bounding box",
+    )
+    bbox_min_lon: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Western edge of the GPS track bounding box",
+    )
+    bbox_max_lat: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Northern edge of the GPS track bounding box",
+    )
+    bbox_max_lon: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+        comment="Eastern edge of the GPS track bounding box",
     )
 
     # Define a relationship to the Users model

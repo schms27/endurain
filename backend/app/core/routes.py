@@ -36,6 +36,8 @@ import health.health_weight.router as health_weight_router
 import health.router as health_router
 import notifications.router as notifications_router
 import routes.route.router as routes_router
+import segments.segment.router as segments_router
+import segments.segment_efforts.router as segment_efforts_router
 import server_settings.public_router as server_settings_public_router
 import server_settings.router as server_settings_router
 import strava.router as strava_router
@@ -126,6 +128,18 @@ router.include_router(
     routes_router.router,
     prefix=core_config.ROOT_PATH + "/routes",
     tags=["routes"],
+    dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    segments_router.router,
+    prefix=core_config.ROOT_PATH + "/segments",
+    tags=["segments"],
+    dependencies=[Depends(auth_dependencies.validate_access_token)],
+)
+router.include_router(
+    segment_efforts_router.router,
+    prefix=core_config.ROOT_PATH + "/segment_efforts",
+    tags=["segments"],
     dependencies=[Depends(auth_dependencies.validate_access_token)],
 )
 router.include_router(

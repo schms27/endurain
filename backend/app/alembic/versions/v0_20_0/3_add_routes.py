@@ -1,7 +1,7 @@
 """3: add planned routes
 
 Revision ID: cb0c2a45883f
-Revises: a4dd90d4f76e
+Revises: d34bd5e7539c
 Create Date: 2026-10-18 18:00:00.000000
 
 """
@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "cb0c2a45883f"
-down_revision: str | None = "a4dd90d4f76e"
+down_revision: str | None = "d34bd5e7539c"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

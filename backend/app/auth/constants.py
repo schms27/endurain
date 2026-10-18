@@ -58,6 +58,7 @@ ACTIVITIES_SCOPE: Final[tuple[str, ...]] = (
 IDENTITY_PROVIDERS_REGULAR_SCOPE: Final[tuple[str, ...]] = ("identity_providers:read",)
 IDENTITY_PROVIDERS_ADMIN_SCOPE: Final[tuple[str, ...]] = ("identity_providers:write",)
 ROUTES_SCOPE: Final[tuple[str, ...]] = ("routes:read", "routes:write")
+SEGMENTS_SCOPE: Final[tuple[str, ...]] = ("segments:read", "segments:write")
 HEALTH_SCOPE: Final[tuple[str, ...]] = (
     "health:read",
     "health:write",
@@ -87,6 +88,8 @@ SCOPE_DICT: Final[dict[str, str]] = {
     "activities:upload": "Upload privileges over activities",
     "routes:read": "Read privileges over planned routes",
     "routes:write": "Write privileges over planned routes",
+    "segments:read": "Read privileges over segments and segment efforts",
+    "segments:write": "Write privileges over segments and segment efforts",
     "health:read": "Read privileges over health data",
     "health:write": "Write privileges over health data",
     "health_targets:read": "Read privileges over health targets data",
@@ -103,6 +106,7 @@ REGULAR_ACCESS_SCOPE: Final[tuple[str, ...]] = (
     USERS_REGULAR_SCOPE
     + ACTIVITIES_SCOPE
     + ROUTES_SCOPE
+    + SEGMENTS_SCOPE
     + GEARS_SCOPE
     + IDENTITY_PROVIDERS_REGULAR_SCOPE
     + HEALTH_SCOPE

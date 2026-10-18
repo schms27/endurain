@@ -11,6 +11,7 @@ root_packages =
     health
     notifications
     routes
+    segments
     server_settings
     strava
     websocket
@@ -29,6 +30,7 @@ source_modules =
     health
     notifications
     routes
+    segments
     server_settings
     strava
     websocket
@@ -51,6 +53,7 @@ source_modules =
     health
     notifications
     routes
+    segments
     server_settings
     strava
     websocket

@@ -47,7 +47,23 @@ class TestStartScheduler:
             from core.scheduler import start_scheduler
 
             start_scheduler()
-            assert mock_add_job.call_count == 13
+            assert mock_add_job.call_count == 14
+
+    def test_segment_match_queue_job_registered(self):
+        """The segment match queue drain runs every minute."""
+        import segments.matching.jobs as segments_jobs
+
+        with (
+            patch("core.scheduler.scheduler") as mock_scheduler,
+            patch("core.scheduler.add_scheduler_job") as mock_add_job,
+        ):
+            mock_scheduler.running = False
+            from core.scheduler import start_scheduler
+
+            start_scheduler()
+
+        calls = [(call.args[0], call.args[1], call.args[2]) for call in mock_add_job.call_args_list]
+        assert (segments_jobs.process_segment_match_queue, "interval", 1) in calls
 
     def test_idp_link_token_cleanup_job_registered(self):
         """IdP link token cleanup must be registered with a 5-minute interval."""

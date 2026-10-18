@@ -4620,6 +4620,241 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/segment_efforts/activity_id/{activity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Activity Segment Efforts
+         * @description Segment efforts of an activity you can see.
+         *
+         *     Args:
+         *         activity_id: Activity ID.
+         *         _validate_activity_id: Activity ID validator dependency.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         Efforts in start-time order (with personal ranks for the owner).
+         */
+        get: operations["read_activity_segment_efforts_api_v1_segment_efforts_activity_id__activity_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/segment_efforts/{effort_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit Segment Effort
+         * @description Exclude or restore one of your efforts.
+         *
+         *     Args:
+         *         effort_id: Effort ID.
+         *         edit: New exclusion state.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The updated effort.
+         */
+        patch: operations["edit_segment_effort_api_v1_segment_efforts__effort_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/segments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Segments
+         * @description List segments visible to you.
+         *
+         *     Args:
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *         sport_group: Only this sport group.
+         *         created_by_me: Only segments you created.
+         *         q: Name search.
+         *         min_lat: Bounding box southern edge (all four or none).
+         *         min_lon: Bounding box western edge.
+         *         max_lat: Bounding box northern edge.
+         *         max_lon: Bounding box eastern edge.
+         *         page_number: 1-based page number.
+         *         num_records: Page size.
+         *
+         *     Returns:
+         *         Matching segments, newest first.
+         *
+         *     Raises:
+         *         HTTPException: 400 when only part of the bounding box is given.
+         */
+        get: operations["list_segments_api_v1_segments_get"];
+        put?: never;
+        /**
+         * Create Segment
+         * @description Create a segment from a slice of one of your activities.
+         *
+         *     Existing activities are matched against it in the background.
+         *
+         *     Args:
+         *         segment: Creation request.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The created segment.
+         */
+        post: operations["create_segment_api_v1_segments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/segments/{segment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Segment
+         * @description Get a segment.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The segment.
+         *
+         *     Raises:
+         *         HTTPException: 404 if missing or not visible.
+         */
+        get: operations["read_segment_api_v1_segments__segment_id__get"];
+        /**
+         * Edit Segment
+         * @description Edit one of your segments.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         edit: Changes to apply.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         The updated segment.
+         */
+        put: operations["edit_segment_api_v1_segments__segment_id__put"];
+        post?: never;
+        /**
+         * Delete Segment
+         * @description Delete one of your segments and its efforts.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         None.
+         */
+        delete: operations["delete_segment_api_v1_segments__segment_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/segments/{segment_id}/efforts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read My Segment Efforts
+         * @description Your efforts on a segment, fastest first.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         Your efforts with personal ranks.
+         *
+         *     Raises:
+         *         HTTPException: 404 if the segment is missing or not visible.
+         */
+        get: operations["read_my_segment_efforts_api_v1_segments__segment_id__efforts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/segments/{segment_id}/rematch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rematch Segment
+         * @description Queue a full rematch of one of your segments.
+         *
+         *     Args:
+         *         segment_id: Segment ID.
+         *         _check_scopes: Scope authorization dependency.
+         *         token_user_id: Authenticated user ID.
+         *         db: Database session.
+         *
+         *     Returns:
+         *         None.
+         */
+        post: operations["rematch_segment_api_v1_segments__segment_id__rematch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/server_settings": {
         parameters: {
             query?: never;
@@ -9875,6 +10110,267 @@ export interface components {
             total: number;
         };
         /**
+         * SegmentCreate
+         * @description Request to create a segment from a slice of one of your activities.
+         *
+         *     Attributes:
+         *         activity_id: Source activity ID (must be owned by the caller).
+         *         start_index: First lat/lon stream index of the slice.
+         *         end_index: Last lat/lon stream index of the slice (inclusive).
+         *         name: Segment name.
+         *         description: Optional description.
+         *         visibility: 0 - public, 2 - private.
+         */
+        SegmentCreate: {
+            /** Activity Id */
+            activity_id: number;
+            /** Description */
+            description?: string | null;
+            /** End Index */
+            end_index: number;
+            /** Name */
+            name: string;
+            /** Start Index */
+            start_index: number;
+            /**
+             * Visibility
+             * @default 0
+             * @enum {integer}
+             */
+            visibility: 0 | 2;
+        };
+        /**
+         * SegmentEdit
+         * @description Editable segment attributes. Geometry is immutable.
+         *
+         *     Attributes:
+         *         name: New name.
+         *         description: New description (null clears it).
+         *         visibility: New visibility.
+         */
+        SegmentEdit: {
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Visibility */
+            visibility?: (0 | 2) | null;
+        };
+        /**
+         * SegmentEffortEdit
+         * @description Owner-editable effort attributes.
+         *
+         *     Attributes:
+         *         is_excluded: Hide (True) or restore (False) the effort.
+         */
+        SegmentEffortEdit: {
+            /** Is Excluded */
+            is_excluded: boolean;
+        };
+        /**
+         * SegmentEffortRead
+         * @description A segment effort with its personal ranking.
+         *
+         *     Attributes:
+         *         id: Effort ID.
+         *         segment_id: Segment ID.
+         *         segment_name: Segment name.
+         *         activity_id: Activity ID.
+         *         user_id: Owner user ID.
+         *         start_time: Start gate crossing time.
+         *         elapsed_time: Elapsed seconds.
+         *         distance: Distance on the segment in metres.
+         *         start_index: Lat/lon stream start index.
+         *         end_index: Lat/lon stream end index.
+         *         average_hr: Average heart rate (bpm).
+         *         max_hr: Maximum heart rate (bpm).
+         *         average_power: Average power (W).
+         *         normalized_power: Normalized power (W).
+         *         average_cad: Average cadence.
+         *         average_speed: Average speed (m/s).
+         *         is_excluded: Hidden by the owner.
+         *         current_rank: Rank among the owner's efforts on this segment
+         *             (1 = PR); None for excluded efforts.
+         *         historical_rank: Rank among the owner's efforts up to this
+         *             effort's date (the achievement at the time); None for
+         *             excluded efforts.
+         */
+        SegmentEffortRead: {
+            /** Activity Id */
+            activity_id: number;
+            /** Average Cad */
+            average_cad: number | null;
+            /** Average Hr */
+            average_hr: number | null;
+            /** Average Power */
+            average_power: number | null;
+            /** Average Speed */
+            average_speed: number | null;
+            /** Current Rank */
+            current_rank?: number | null;
+            /** Distance */
+            distance: number;
+            /** Elapsed Time */
+            elapsed_time: number;
+            /** End Index */
+            end_index: number;
+            /** Historical Rank */
+            historical_rank?: number | null;
+            /** Id */
+            id: number;
+            /** Is Excluded */
+            is_excluded: boolean;
+            /** Max Hr */
+            max_hr: number | null;
+            /** Normalized Power */
+            normalized_power: number | null;
+            /** Segment Id */
+            segment_id: number;
+            /** Segment Name */
+            segment_name?: string | null;
+            /** Start Index */
+            start_index: number;
+            /**
+             * Start Time
+             * Format: date-time
+             */
+            start_time: string;
+            /** User Id */
+            user_id: number;
+        };
+        /**
+         * SegmentRead
+         * @description Full segment details.
+         *
+         *     Attributes:
+         *         description: Description.
+         *         geometry: Simplified ``[[lat, lon, ele | None], ...]`` polyline.
+         *         elevation_loss: Elevation loss in metres.
+         *         maximum_grade: Maximum grade over 100 m windows, in percent.
+         *         end_lat: End latitude.
+         *         end_lon: End longitude.
+         *         source_activity_id: Activity the segment was cut from.
+         *         updated_at: Last update timestamp.
+         */
+        SegmentRead: {
+            /** Athlete Count */
+            athlete_count: number;
+            /** Average Grade */
+            average_grade: number | null;
+            /** City */
+            city: string | null;
+            /** Country */
+            country: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string | null;
+            /** Distance */
+            distance: number;
+            /** Effort Count */
+            effort_count: number;
+            /** Elevation Gain */
+            elevation_gain: number | null;
+            /** Elevation Loss */
+            elevation_loss: number | null;
+            /** End Lat */
+            end_lat: number;
+            /** End Lon */
+            end_lon: number;
+            /** Geometry */
+            geometry: (number | null)[][];
+            /** Id */
+            id: number;
+            /** Is Archived */
+            is_archived: boolean;
+            /** Maximum Grade */
+            maximum_grade: number | null;
+            /** Name */
+            name: string;
+            /** Source Activity Id */
+            source_activity_id: number | null;
+            sport_group: components["schemas"]["SportGroup"];
+            /** Start Lat */
+            start_lat: number;
+            /** Start Lon */
+            start_lon: number;
+            /** Town */
+            town: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** User Id */
+            user_id: number | null;
+            /** Visibility */
+            visibility: number;
+        };
+        /**
+         * SegmentSummary
+         * @description Segment fields for lists (no geometry).
+         *
+         *     Attributes:
+         *         id: Segment ID.
+         *         user_id: Creator user ID.
+         *         name: Segment name.
+         *         sport_group: Sport group.
+         *         visibility: 0 - public, 2 - private.
+         *         distance: Length in metres.
+         *         elevation_gain: Elevation gain in metres.
+         *         average_grade: Average grade in percent.
+         *         start_lat: Start latitude.
+         *         start_lon: Start longitude.
+         *         city: City of the start point.
+         *         town: Town of the start point.
+         *         country: Country of the start point.
+         *         is_archived: Whether the segment is archived.
+         *         effort_count: Number of stored efforts.
+         *         athlete_count: Number of distinct users with efforts.
+         *         created_at: Creation timestamp.
+         */
+        SegmentSummary: {
+            /** Athlete Count */
+            athlete_count: number;
+            /** Average Grade */
+            average_grade: number | null;
+            /** City */
+            city: string | null;
+            /** Country */
+            country: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Distance */
+            distance: number;
+            /** Effort Count */
+            effort_count: number;
+            /** Elevation Gain */
+            elevation_gain: number | null;
+            /** Id */
+            id: number;
+            /** Is Archived */
+            is_archived: boolean;
+            /** Name */
+            name: string;
+            sport_group: components["schemas"]["SportGroup"];
+            /** Start Lat */
+            start_lat: number;
+            /** Start Lon */
+            start_lon: number;
+            /** Town */
+            town: string | null;
+            /** User Id */
+            user_id: number | null;
+            /** Visibility */
+            visibility: number;
+        };
+        /**
          * ServerSettingsEdit
          * @description Edit schema for server settings updates.
          *
@@ -10273,6 +10769,18 @@ export interface components {
          * @enum {integer}
          */
         SleepStageType: 0 | 1 | 2 | 3;
+        /**
+         * SportGroup
+         * @description Group of activity types that share segments.
+         *
+         *     Members:
+         *         RUN: Outdoor running.
+         *         RIDE: Outdoor cycling without motor assistance.
+         *         E_RIDE: Motor-assisted cycling.
+         *         FOOT: Walking and hiking.
+         * @enum {string}
+         */
+        SportGroup: "run" | "ride" | "e_ride" | "foot";
         /**
          * StepUpVerification
          * @description Generic step-up verification payload.
@@ -17305,6 +17813,301 @@ export interface operations {
                 };
                 content: {
                     "application/gpx+xml": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_activity_segment_efforts_api_v1_segment_efforts_activity_id__activity_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                activity_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentEffortRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_segment_effort_api_v1_segment_efforts__effort_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                effort_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SegmentEffortEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentEffortRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_segments_api_v1_segments_get: {
+        parameters: {
+            query?: {
+                sport_group?: components["schemas"]["SportGroup"] | null;
+                created_by_me?: boolean;
+                q?: string | null;
+                min_lat?: number | null;
+                min_lon?: number | null;
+                max_lat?: number | null;
+                max_lon?: number | null;
+                page_number?: number;
+                num_records?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_segment_api_v1_segments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SegmentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_segment_api_v1_segments__segment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_segment_api_v1_segments__segment_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SegmentEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_segment_api_v1_segments__segment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_my_segment_efforts_api_v1_segments__segment_id__efforts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SegmentEffortRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rematch_segment_api_v1_segments__segment_id__rematch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                segment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
