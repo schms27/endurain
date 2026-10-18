@@ -55,7 +55,7 @@ PRs that are too large to review efficiently will be asked to be split before th
 
 - **Always discuss in an issue first** — this is required, not optional
 - Features that haven't been discussed and approved in an issue may be closed without review, regardless of quality
-- Check the [ROADMAP.md](https://github.com/endurain-project/endurain/blob/master/ROADMAP.md) before proposing something that may already be planned
+- Check the [ROADMAP.md](https://github.com/schms27/endurain/blob/master/ROADMAP.md) before proposing something that may already be planned
 
 ### Refactors and Code Quality
 
